@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الدر المكنون - نظام إدارة التوزيع الذكي</title>
+    <!-- مكتبات خارجية -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        /* --- المتغيرات والتنسيقات الأساسية --- */
+        :root { 
+            --primary: #0f172a; --secondary: #1e293b; --accent: #3b82f6; 
+            --success: #10b981; --danger: #ef4444; --warning: #f59e0b; 
+            --bg: #f8fafc; --text-main: #334155; --gold: #d4af37;
+        }
+        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;800&display=swap');
+        body { font-family: 'Tajawal', sans-serif; background-color: var(--bg); margin: 0; padding: 0; color: var(--text-main); overflow-x: hidden;}
+        
+        /* --- شاشة تسجيل الدخول --- */
+        #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, var(--primary), var(--secondary)); z-index: 9999; display: flex; justify-content: center; align-items: center; }
+        .login-box { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); text-align: center; width: 90%; max-width: 400px; animation: slideUp 0.5s ease;}
+        .login-box h2 { color: var(--primary); margin-bottom: 30px; font-weight: 800;}
+        .login-input { width: 100%; padding: 15px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 18px; margin-bottom: 20px; text-align: center; font-family: 'Tajawal', sans-serif; transition: 0.3s;}
+        .login-input:focus { border-color: var(--accent); outline: none; }
+        .login-btn { width: 100%; padding: 15px; background: linear-gradient(135deg, var(--accent), #2563eb); color: white; border: none; border-radius: 10px; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .login-btn:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(59, 130, 246, 0.4); }
+        .login-error { color: var(--danger); margin-top: 15px; display: none; font-weight: bold; }
+
+        /* --- الهيكل العام --- */
+        #mainApp { display: none; }
+        
+        .app-header { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; text-align: center; padding: 30px 20px; position: relative; overflow: hidden; border-bottom: 4px solid var(--gold); }
+        .app-title { font-size: 32px; font-weight: 800; margin: 0; position: relative; z-index: 1;}
+        .programmer-tag { position: absolute; top: 15px; right: 15px; font-size: 12px; background: rgba(255,255,255,0.1); padding: 5px 15px; border-radius: 20px; border: 1px solid var(--gold); color: var(--gold); }
+        .user-badge { position: absolute; top: 15px; left: 15px; font-size: 14px; background: var(--accent); padding: 5px 15px; border-radius: 20px; font-weight: bold; }
+
+        .navbar { display: flex; background: white; padding: 10px 20px; justify-content: center; gap: 10px; flex-wrap: wrap; box-shadow: 0 10px 30px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100;}
+        .nav-btn { background: transparent; border: 2px solid transparent; color: var(--text-main); font-size: 16px; font-weight: 700; cursor: pointer; padding: 10px 20px; border-radius: 12px; transition: 0.3s; display: flex; align-items: center; gap: 8px;}
+        .nav-btn:hover { background: #f1f5f9; }
+        .nav-btn.active { background: var(--accent); color: white; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4); }
+        .admin-only { display: none; }
+
+        .container { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
+        .page-section { display: none; background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.04); animation: slideUp 0.4s ease; }
+        .page-section.active { display: block; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- الأزرار والحقول --- */
+        .btn { padding: 12px 25px; border: none; border-radius: 10px; cursor: pointer; font-size: 16px; font-weight: 700; color: white; transition: 0.3s; display: inline-flex; align-items: center; gap: 8px;}
+        .btn-primary { background: linear-gradient(135deg, var(--accent), #2563eb); }
+        .btn-success { background: linear-gradient(135deg, var(--success), #059669); }
+        .btn-danger { background: linear-gradient(135deg, var(--danger), #dc2626); }
+        .btn-warning { background: linear-gradient(135deg, var(--warning), #d97706); color: white;}
+        .btn:hover { transform: translateY(-3px); box-shadow: 0 8px 15px rgba(0,0,0,0.15); }
+        
+        input, select, textarea { padding: 12px 15px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 16px; width: 100%; box-sizing: border-box; margin-bottom: 15px; transition: 0.3s; font-family: 'Tajawal', sans-serif; font-weight: 700;}
+        input:focus, select:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+        
+        .search-bar { position: relative; margin-bottom: 20px; }
+        .search-bar input { padding-right: 40px; border-color: var(--accent); }
+        .search-bar i { position: absolute; right: 15px; top: 15px; color: var(--accent); }
+
+        /* --- الإحصائيات (Dashboard) --- */
+        .dashboard-layout { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
+        @media (max-width: 768px) { .dashboard-layout { grid-template-columns: 1fr; } }
+        
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .stat-card { background: white; padding: 20px; border-radius: 15px; text-align: center; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px rgba(0,0,0,0.02); transition: 0.3s; position: relative; overflow: hidden;}
+        .stat-card:hover { transform: translateY(-5px); border-color: var(--accent);}
+        .stat-number { font-size: 32px; font-weight: 800; color: var(--primary); margin-bottom: 5px;}
+        .stat-label { font-size: 14px; font-weight: 700; color: #64748b; }
+        
+        /* --- الجداول والتبويبات --- */
+        .table-container { overflow-x: auto; border-radius: 15px; border: 1px solid #e2e8f0; max-height: 500px; overflow-y: auto;}
+        table { width: 100%; border-collapse: collapse; background: white; }
+        th, td { padding: 12px; text-align: right; border-bottom: 1px solid #e2e8f0; }
+        th { background-color: #f8fafc; color: var(--primary); font-weight: 800; position: sticky; top: 0; z-index: 10;}
+        tr:hover { background-color: #f1f5f9; }
+
+        .tab-buttons { display: flex; gap: 10px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px; }
+        .tab-btn { flex: 1; min-width: 100px; padding: 10px; background: white; border: 2px solid #e2e8f0; border-radius: 10px; cursor: pointer; font-weight: 800; color: #64748b; transition: 0.3s; }
+        .tab-btn.active { background: var(--accent); border-color: var(--accent); color: white; }
+        .category-table { display: none; }
+        .category-table.active { display: block; animation: fadeIn 0.4s; }
+
+        /* --- الأرشيف (الجديد) --- */
+        .archive-layout { display: flex; gap: 20px; margin-top: 20px; }
+        @media (max-width: 768px) { .archive-layout { flex-direction: column; } }
+        .archive-sidebar { flex: 1; background: #f8fafc; padding: 20px; border-radius: 15px; border: 1px solid #e2e8f0; max-height: 500px; overflow-y: auto;}
+        .archive-content { flex: 2; background: white; padding: 20px; border-radius: 15px; border: 1px solid #e2e8f0; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .archive-name-btn { width: 100%; text-align: right; background: white; border: 1px solid #e2e8f0; padding: 10px; margin-bottom: 5px; border-radius: 8px; cursor: pointer; font-weight: 700; transition: 0.2s;}
+        .archive-name-btn:hover { border-color: var(--accent); background: #f1f5f9;}
+        .archive-name-btn.active { background: var(--accent); color: white; border-color: var(--accent);}
+        
+        .history-list { list-style: none; padding: 0; margin: 0;}
+        .history-item { padding: 15px; border-radius: 10px; margin-bottom: 10px; font-weight: 800; display: flex; justify-content: space-between; align-items: center;}
+        .history-item.taken { background: #dcfce7; color: #166534; border-right: 5px solid var(--success); }
+        .history-item.missed { background: #fee2e2; color: #991b1b; border-right: 5px solid var(--danger); }
+
+        /* Modal */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.8); z-index: 1000; justify-content: center; align-items: center; }
+        .modal-content { background: white; padding: 30px; border-radius: 20px; width: 90%; max-width: 450px; animation: slideUp 0.3s;}
+    </style>
+</head>
+<body>
+
+    <audio id="audioSuccess" src="https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3"></audio>
+    <audio id="audioError" src="https://assets.mixkit.co/active_storage/sfx/2954/2954-preview.mp3"></audio>
+
+    <!-- شاشة تسجيل الدخول -->
+    <div id="loginOverlay">
+        <div class="login-box">
+            <i class="fas fa-shield-alt" style="font-size: 50px; color: var(--gold); margin-bottom: 15px;"></i>
+            <h2>بوابة الدخول الآمنة</h2>
+            <input type="password" id="loginPassword" class="login-input" placeholder="كلمة المرور..." onkeypress="handleLoginPress(event)">
+            <button class="login-btn" onclick="checkLogin()"><i class="fas fa-sign-in-alt"></i> دخول النظام</button>
+            <div id="loginError" class="login-error">❌ كلمة المرور غير صحيحة</div>
+        </div>
+    </div>
+
+    <!-- التطبيق الرئيسي -->
+    <div id="mainApp">
+        <header class="app-header">
+            <div class="programmer-tag"><i class="fas fa-code"></i> تصميم وبرمجة: الدر المكنون</div>
+            <div id="userBadge" class="user-badge"></div>
+            <h1 class="app-title"><i class="fas fa-hands-holding-circle"></i> نظام التوزيع الذكي (VIP)</h1>
+            <button onclick="logout()" style="position: absolute; bottom: 10px; left: 15px; background: rgba(255,0,0,0.5); color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;"><i class="fas fa-sign-out-alt"></i> خروج</button>
+        </header>
+
+        <div class="navbar">
+            <button class="nav-btn active" onclick="switchPage('scannerPage', this)"><i class="fas fa-camera"></i> التوزيع</button>
+            <button class="nav-btn admin-only" onclick="switchPage('archivePage', this); loadArchiveCategory('ايتام', document.getElementById('tab-arch-1'));"><i class="fas fa-folder-open"></i> أرشيف المستفيدين</button>
+            <button class="nav-btn admin-only" onclick="switchPage('reportsPage', this); loadDistributionReport();"><i class="fas fa-clipboard-check"></i> تقارير التسليم</button>
+            <button class="nav-btn admin-only" onclick="switchPage('dashboardPage', this); loadStats();"><i class="fas fa-database"></i> الإدارة والبيانات</button>
+            <button class="nav-btn admin-only" onclick="switchPage('settingsPage', this)"><i class="fas fa-cloud-upload-alt"></i> تحديث الإكسل</button>
+        </div>
+
+        <div class="container">
+            
+            <!-- ================= 1. شاشة التوزيع ================= -->
+            <div id="scannerPage" class="page-section active">
+                <h2 style="color: var(--primary);"><i class="fas fa-qrcode"></i> عملية توزيع الوجبات أو المواد</h2>
+                <div style="background: #f8fafc; padding: 25px; border-radius: 20px; border: 2px dashed #cbd5e1; text-align: center;">
+                    <div style="background: white; padding: 20px; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); text-align: right;">
+                        <h4 style="margin-top: 0; color: var(--accent);"><i class="fas fa-box-open"></i> إعدادات التوزيع الحالية:</h4>
+                        <label style="font-weight: 800; display: block; margin-bottom: 5px;">1. الفئة المسموح لها بالاستلام:</label>
+                        <select id="categorySelect">
+                            <option value="الكل">السماح لجميع الفئات بالاستلام</option>
+                            <option value="ايتام">مخصص للأيتام فقط</option>
+                            <option value="ارملة">مخصص للأرامل فقط</option>
+                            <option value="مطلقة">مخصص للمطلقات فقط</option>
+                            <option value="فقير">مخصص للفقراء فقط</option>
+                            <option value="إعاقة">مخصص لذوي الإعاقة فقط</option>
+                        </select>
+                        <label style="font-weight: 800; display: block; margin-bottom: 5px;">2. اسم المادة التي يتم توزيعها:</label>
+                        <input type="text" id="distributedItemName" placeholder="مثال: لحمة، سلة غذائية..." style="border-color: var(--warning);">
+                    </div>
+                    <button class="btn btn-success" style="font-size: 20px; padding: 15px 40px; width: 100%;" onclick="window.startScanner()"><i class="fas fa-camera"></i> تشغيل الكاميرا</button>
+                </div>
+                <div id="reader" style="display: none; width: 100%; max-width: 450px; margin: 20px auto; border-radius: 20px; overflow: hidden; border: 4px solid white; box-shadow: 0 10px 30px rgba(0,0,0,0.2);"></div>
+                <div id="loadingScanner" style="display: none; text-align: center; margin: 20px; font-weight: 800; font-size: 20px; color: var(--accent);"><i class="fas fa-spinner fa-spin"></i> المطابقة مع السيرفر...</div>
+                <div id="resultBox" style="padding: 30px 20px; border-radius: 15px; font-size: 24px; font-weight: 800; color: white; text-align: center; margin-top: 25px; display: none;">
+                    <div id="resultText"></div>
+                    <button class="btn" style="background: white; color: var(--text-main); margin-top: 20px; width: 100%; font-size: 20px;" onclick="window.resetScanner()">مسح بطاقة تالية <i class="fas fa-redo"></i></button>
+                </div>
+            </div>
+
+            <!-- ================= 2. شاشة الأرشيف الشامل (الجديدة) ================= -->
+            <div id="archivePage" class="page-section">
+                <h2 style="color: var(--primary);"><i class="fas fa-folder-open"></i> الأرشيف الشامل للمستفيدين</h2>
+                
+                <div class="tab-buttons">
+                    <button id="tab-arch-1" class="tab-btn active" onclick="loadArchiveCategory('ايتام', this)">الأيتام</button>
+                    <button id="tab-arch-2" class="tab-btn" onclick="loadArchiveCategory('ارملة', this)">الأرامل</button>
+                    <button id="tab-arch-3" class="tab-btn" onclick="loadArchiveCategory('مطلقة', this)">المطلقات</button>
+                    <button id="tab-arch-4" class="tab-btn" onclick="loadArchiveCategory('فقير', this)">الفقراء</button>
+                    <button id="tab-arch-5" class="tab-btn" onclick="loadArchiveCategory('إعاقة', this)">الإعاقة</button>
+                </div>
+
+                <div class="archive-layout">
+                    <!-- القائمة الجانبية للأسماء -->
+                    <div class="archive-sidebar">
+                        <div class="search-bar" style="margin-bottom: 10px;">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="archiveSearchInput" placeholder="بحث بالاسم..." onkeyup="filterArchiveNames()">
+                        </div>
+                        <div id="archiveNamesList" style="text-align: center; font-weight: bold;">⏳ جاري التحميل...</div>
+                    </div>
+
+                    <!-- تفاصيل السجل الخاص بالمستفيد -->
+                    <div class="archive-content">
+                        <div id="archiveDetailsContent" style="text-align: center; color: #64748b; font-weight: 800; margin-top: 50px;">
+                            <i class="fas fa-hand-pointer" style="font-size: 40px; margin-bottom: 15px;"></i><br>
+                            الرجاء اختيار اسم من القائمة الجانبية لعرض السجل الكامل (ماذا أخذ وماذا لم يأخذ).
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= 3. تقارير التسليم ================= -->
+            <div id="reportsPage" class="page-section">
+                <h2 style="color: var(--primary);"><i class="fas fa-chart-line"></i> تقارير التوزيع اليومية</h2>
+                <div style="background: #f1f5f9; padding: 20px; border-radius: 15px; margin-bottom: 20px; display: flex; gap: 15px; flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 200px;">
+                        <label style="font-weight: 800; margin-bottom: 5px; display: block;">الفئة لعرض التقرير:</label>
+                        <select id="reportCategory" onchange="loadDistributionReport()"><option value="الكل">الجميع</option><option value="ايتام">أيتام</option><option value="ارملة">أرامل</option><option value="مطلقة">مطلقات</option><option value="فقير">فقراء</option><option value="إعاقة">إعاقة</option></select>
+                    </div>
+                    <div style="flex: 1; min-width: 200px;">
+                        <label style="font-weight: 800; margin-bottom: 5px; display: block;">تقرير مادة معينة (اختياري):</label>
+                        <input type="text" id="reportItemName" placeholder="مثال: لحمة" onkeyup="loadDistributionReport()">
+                    </div>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                    <h3 style="color: var(--danger); margin: 0;"><i class="fas fa-list"></i> قائمة بأسماء من لم يستلموا:</h3>
+                    <button class="btn btn-export" onclick="exportToExcel()"><i class="fas fa-file-excel"></i> تصدير التقرير لـ Excel</button>
+                </div>
+                <div class="table-container" style="max-height: 400px;">
+                    <table id="missedTable">
+                        <thead><tr><th>رقم البطاقة</th><th>الاسم</th><th>الفئة</th><th>الجوال</th></tr></thead>
+                        <tbody id="missedTableBody"><tr><td colspan="4" style="text-align:center;">جاري تحميل التقرير...</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ================= 4. الإدارة المركزية ================= -->
+            <div id="dashboardPage" class="page-section">
+                <h2 style="color: var(--primary);"><i class="fas fa-database"></i> الإدارة المركزية والبيانات</h2>
+                <div class="dashboard-layout">
+                    <div>
+                        <div class="stats-grid">
+                            <div class="stat-card"><div class="stat-number" id="stat-total">0</div><div class="stat-label">الإجمالي</div></div>
+                            <div class="stat-card"><div class="stat-number" id="stat-orphans" style="color:#e83e8c;">0</div><div class="stat-label">أيتام</div></div>
+                            <div class="stat-card"><div class="stat-number" id="stat-widows" style="color:#6f42c1;">0</div><div class="stat-label">أرامل</div></div>
+                            <div class="stat-card"><div class="stat-number" id="stat-divorced" style="color:#fd7e14;">0</div><div class="stat-label">مطلقات</div></div>
+                            <div class="stat-card"><div class="stat-number" id="stat-poor" style="color:#10b981;">0</div><div class="stat-label">فقير</div></div>
+                            <div class="stat-card"><div class="stat-number" id="stat-special" style="color:#3b82f6;">0</div><div class="stat-label">إعاقة</div></div>
+                        </div>
+                    </div>
+                    <div class="chart-container"><canvas id="categoryChart"></canvas></div>
+                </div>
+                <hr style="border: 1px solid #e2e8f0; margin: 30px 0;">
+                <div class="search-bar"><i class="fas fa-search"></i><input type="text" id="searchInput" placeholder="بحث سريع في القاعدة..." onkeyup="filterTables()"></div>
+                <div class="tab-buttons">
+                    <button class="tab-btn active" onclick="showCategoryTable('ايتام', this)">الأيتام</button>
+                    <button class="tab-btn" onclick="showCategoryTable('ارملة', this)">الأرامل</button>
+                    <button class="tab-btn" onclick="showCategoryTable('مطلقة', this)">المطلقات</button>
+                    <button class="tab-btn" onclick="showCategoryTable('فقير', this)">الفقراء</button>
+                    <button class="tab-btn" onclick="showCategoryTable('إعاقة', this)">الإعاقة</button>
+                </div>
+                <div class="table-container" id="tablesContainer"><div style="text-align: center; padding: 30px;">⏳ جاري سحب البيانات...</div></div>
+            </div>
+
+            <!-- ================= 5. تحديث الإكسل ================= -->
+            <div id="settingsPage" class="page-section">
+                <h2 style="color: var(--primary);"><i class="fas fa-file-excel"></i> تحديث قاعدة البيانات (Excel)</h2>
+                <div style="border: 3px dashed var(--danger); padding: 50px 20px; border-radius: 20px; text-align: center; background: #fff5f5;">
+                    <p style="font-size: 18px; font-weight: 700; color: #7f1d1d;">رفع ملف إكسل جديد سيقوم <b>بمسح جميع أسماء المستفيدين الحالية</b> واستبدالها.</p>
+                    <label for="fileUpload" class="btn btn-danger" style="font-size: 20px; padding: 15px 40px; border-radius: 50px;"><i class="fas fa-file-import"></i> اختيار ملف Excel للرفع</label>
+                    <input type="file" id="fileUpload" accept=".xlsx, .xls" style="display: none;" />
+                    <div id="uploadStatus" style="margin-top: 25px; font-weight: 800; font-size: 18px;"></div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- أكواد Firebase -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getFirestore, collection, setDoc, doc, getDoc, getDocs, deleteDoc, query } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyA1GTSVUrUJXjNU0m6cRFCgswpmHYPg3A0",
+            authDomain: "charity-app-52420.firebaseapp.com",
+            projectId: "charity-app-52420",
+            storageBucket: "charity-app-52420.firebasestorage.app",
+            messagingSenderId: "962584387749",
+            appId: "1:962584387749:web:7b98d9b101f533c03e6d4c"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        
+        let html5QrCode = null;
+        let allBeneficiaries = []; 
+        let allDeliveriesGlobal = []; // كل التسليمات في السيرفر (للأرشيف)
+        let missedListForExport = []; 
+        let myChart = null; 
+        let currentUserRole = ""; 
+        let currentArchiveCategoryData = []; // أسماء الفئة المحددة في الأرشيف
+
+        const playSound = (type) => { try { document.getElementById(type === 'success' ? 'audioSuccess' : 'audioError').play(); } catch(e){} };
+
+        // --- تسجيل الدخول والتنقل ---
+        window.handleLoginPress = function(e) { if(e.key === 'Enter') checkLogin(); }
+        window.checkLogin = function() {
+            const pass = document.getElementById('loginPassword').value;
+            if(pass === 'admin123') {
+                currentUserRole = "admin"; document.getElementById('userBadge').innerHTML = '<i class="fas fa-user-shield"></i> مدير';
+                document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'flex'); loginSuccess();
+            } else if (pass === 'vol123') {
+                currentUserRole = "volunteer"; document.getElementById('userBadge').innerHTML = '<i class="fas fa-hands-helping"></i> متطوع';
+                document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none'); loginSuccess();
+            } else document.getElementById('loginError').style.display = 'block';
+        };
+        function loginSuccess() {
+            document.getElementById('loginOverlay').style.display = 'none'; document.getElementById('mainApp').style.display = 'block';
+            switchPage('scannerPage', document.querySelector('.navbar button:first-child'));
+            if(currentUserRole === 'admin') { loadStats(); fetchAllDeliveries(); }
+        }
+        window.logout = function() { location.reload(); };
+
+        window.switchPage = function(pageId, btnElement) {
+            document.querySelectorAll('.page-section').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active'); btnElement.classList.add('active');
+            if (pageId !== 'scannerPage' && html5QrCode) { try { html5QrCode.stop(); document.getElementById('reader').style.display='none'; } catch(e){} }
+        };
+
+        // --- 1. الكاميرا ---
+        window.checkBeneficiary = async function(qrText) {
+            const resultBox = document.getElementById('resultBox'); const resultText = document.getElementById('resultText');
+            document.getElementById('loadingScanner').style.display = 'block';
+            let scannedCardId = qrText.trim(); const match = qrText.match(/رقم البطاقة:\s*(\d+)/); if (match && match[1]) scannedCardId = match[1];
+            const selectedCat = document.getElementById('categorySelect').value;
+            const itemName = document.getElementById('distributedItemName').value.trim() || "مواد عامة";
+
+            try {
+                const docRef = doc(db, "beneficiaries", scannedCardId); const docSnap = await getDoc(docRef);
+                document.getElementById('loadingScanner').style.display = 'none'; resultBox.style.display = 'block';
+
+                if (docSnap.exists()) {
+                    const data = docSnap.data(); const benCat = data.category;
+                    if (selectedCat !== "الكل" && !benCat.includes(selectedCat)) {
+                        resultBox.style.background = "linear-gradient(135deg, var(--danger), #b91c1c)";
+                        resultText.innerHTML = `<i class="fas fa-times-circle" style="font-size:50px; display:block;"></i>مرفوض<br>الفئة غير مطابقة<br>${data.name}`;
+                        playSound('error'); return;
+                    }
+                    const today = new Date().toISOString().split('T')[0];
+                    const deliveryId = `${scannedCardId}_${today}_${itemName}`;
+                    const deliveryRef = doc(db, "deliveries", deliveryId); const deliverySnap = await getDoc(deliveryRef);
+
+                    if (deliverySnap.exists()) {
+                        resultBox.style.background = "linear-gradient(135deg, var(--warning), #d97706)";
+                        resultText.innerHTML = `<i class="fas fa-exclamation-triangle" style="font-size:50px; display:block;"></i>مرفوض<br>استلم (${itemName}) اليوم<br>${data.name}`;
+                        playSound('error');
+                    } else {
+                        const timestamp = new Date().toLocaleString('ar-EG');
+                        await setDoc(deliveryRef, { card_id: scannedCardId, name: data.name, date: timestamp, category: benCat, item_name: itemName, system_date: today });
+                        resultBox.style.background = "linear-gradient(135deg, var(--success), #059669)";
+                        resultText.innerHTML = `<i class="fas fa-check-circle" style="font-size:50px; display:block;"></i>تم التسليم<br>[ ${itemName} ]<br>${data.name}`;
+                        playSound('success');
+                    }
+                } else {
+                    resultBox.style.background = "linear-gradient(135deg, var(--danger), #b91c1c)"; resultText.innerHTML = `<i class="fas fa-search-minus" style="font-size:50px; display:block;"></i>البطاقة غير معرفة`; playSound('error');
+                }
+            } catch (error) { document.getElementById('loadingScanner').style.display = 'none'; resultBox.style.background = "var(--danger)"; resultText.innerHTML = "خطأ اتصال"; playSound('error'); }
+        };
+
+        window.startScanner = function() {
+            if(!document.getElementById('distributedItemName').value.trim()) { alert("يرجى كتابة اسم المادة الموزعة أولاً!"); return; }
+            document.getElementById('reader').style.display = 'block';
+            if(!html5QrCode) html5QrCode = new Html5Qrcode("reader");
+            html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: { width: 250, height: 250 } },
+                (decodedText) => { html5QrCode.stop().then(() => { document.getElementById('reader').style.display = 'none'; window.checkBeneficiary(decodedText); }); }, (err) => {}
+            ).catch((err) => console.log(err));
+        };
+        window.resetScanner = function() { document.getElementById('resultBox').style.display = 'none'; window.startScanner(); };
+
+        // --- 2. الأرشيف الشامل (الجديد) ---
+        async function fetchAllDeliveries() {
+            const q = query(collection(db, "deliveries"));
+            const querySnapshot = await getDocs(q);
+            allDeliveriesGlobal = [];
+            querySnapshot.forEach((doc) => allDeliveriesGlobal.push(doc.data()));
+        }
+
+        window.loadArchiveCategory = async function(catFilter, btn) {
+            document.querySelectorAll('#archivePage .tab-btn').forEach(b => b.classList.remove('active'));
+            if(btn) btn.classList.add('active');
+            
+            document.getElementById('archiveNamesList').innerHTML = "⏳ جاري التحميل...";
+            document.getElementById('archiveDetailsContent').innerHTML = "<i class='fas fa-hand-pointer' style='font-size: 40px; margin-bottom: 15px;'></i><br>الرجاء اختيار اسم من القائمة لعرض السجل الكامل.";
+            
+            if(allBeneficiaries.length === 0) await fetchAllBeneficiaries();
+            if(allDeliveriesGlobal.length === 0) await fetchAllDeliveries();
+
+            currentArchiveCategoryData = allBeneficiaries.filter(b => {
+                const bc = b.category || "";
+                if(catFilter === 'فقير') return bc.includes('فقير') || bc.includes('فقراء');
+                if(catFilter === 'إعاقة') return bc.includes('إعاقة') || bc.includes('اعاقة') || bc.includes('احتياجات');
+                return bc.includes(catFilter);
+            });
+
+            renderArchiveNames(currentArchiveCategoryData);
+        };
+
+        window.filterArchiveNames = function() {
+            const query = document.getElementById('archiveSearchInput').value.toLowerCase();
+            const filtered = currentArchiveCategoryData.filter(b => b.name.toLowerCase().includes(query));
+            renderArchiveNames(filtered);
+        }
+
+        function renderArchiveNames(list) {
+            const listDiv = document.getElementById('archiveNamesList');
+            listDiv.innerHTML = "";
+            if(list.length === 0) { listDiv.innerHTML = "لا يوجد أسماء"; return; }
+            list.forEach(b => {
+                const btn = document.createElement('button');
+                btn.className = 'archive-name-btn';
+                btn.innerText = b.name;
+                btn.onclick = () => {
+                    document.querySelectorAll('.archive-name-btn').forEach(x => x.classList.remove('active'));
+                    btn.classList.add('active');
+                    showPersonArchive(b);
+                };
+                listDiv.appendChild(btn);
+            });
+        }
+
+        function showPersonArchive(person) {
+            const contentDiv = document.getElementById('archiveDetailsContent');
+            
+            // 1. ماذا أخذ؟ (سجلاته في deliveries)
+            const personHistory = allDeliveriesGlobal.filter(d => d.card_id === person.card_id);
+            
+            // 2. ماذا تم توزيعه لفئته عموماً؟ (نجلب كل المواد الفريدة التي وزعت لفئته)
+            const catDeliveries = allDeliveriesGlobal.filter(d => d.category === person.category);
+            const allItemsDistributedToCat = [...new Set(catDeliveries.map(d => d.item_name))]; // مصفوفة بالمواد الفريدة
+            
+            const itemsTaken = [...new Set(personHistory.map(d => d.item_name))];
+            
+            // 3. ماذا لم يأخذ؟ (مواد وزعت لفئته وهو لم يأخذها)
+            const itemsMissed = allItemsDistributedToCat.filter(item => !itemsTaken.includes(item));
+
+            let html = `<h3 style="color:var(--primary); margin-top:0; border-bottom:2px solid var(--accent); padding-bottom:10px;">${person.name} <span style="font-size:14px; color:#64748b;">(بطاقة: ${person.card_id})</span></h3>`;
+            
+            html += `<h4 style="color:var(--success); text-align:right;"><i class="fas fa-check-circle"></i> ماذا استلم؟</h4>`;
+            html += `<ul class="history-list">`;
+            if(personHistory.length === 0) {
+                html += `<li class="history-item taken" style="background:#f1f5f9; color:#64748b; border-color:#cbd5e1;">لم يستلم أي مادة حتى الآن.</li>`;
+            } else {
+                // ترتيب تنازلي حسب التاريخ
+                personHistory.sort((a,b) => new Date(b.date) - new Date(a.date));
+                personHistory.forEach(h => {
+                    html += `<li class="history-item taken">
+                        <span><i class="fas fa-box"></i> ${h.item_name}</span>
+                        <span style="font-size:12px; color:#166534;">${h.date}</span>
+                    </li>`;
+                });
+            }
+            html += `</ul>`;
+
+            html += `<h4 style="color:var(--danger); text-align:right; margin-top:25px;"><i class="fas fa-times-circle"></i> ماذا لم يستلم؟ (فاته)</h4>`;
+            html += `<ul class="history-list">`;
+            if(itemsMissed.length === 0) {
+                html += `<li class="history-item missed" style="background:#f1f5f9; color:#64748b; border-color:#cbd5e1;">استلم جميع المواد التي تم توزيعها لفئته.</li>`;
+            } else {
+                itemsMissed.forEach(item => {
+                    html += `<li class="history-item missed">
+                        <span><i class="fas fa-box-open"></i> ${item}</span>
+                        <span style="font-size:12px; color:#991b1b;">تم توزيعها لفئته ولكنه لم يحضر</span>
+                    </li>`;
+                });
+            }
+            html += `</ul>`;
+
+            contentDiv.innerHTML = html;
+        }
+
+        // --- 3. الإدارة والتقارير العامة ---
+        async function fetchAllBeneficiaries() {
+            const querySnapshot = await getDocs(collection(db, "beneficiaries"));
+            allBeneficiaries = []; querySnapshot.forEach((doc) => allBeneficiaries.push(doc.data()));
+        }
+
+        window.loadDistributionReport = async function() {
+            document.getElementById('missedTableBody').innerHTML = `<tr><td colspan="4" style="text-align:center;">جاري الحساب...</td></tr>`;
+            if(allBeneficiaries.length === 0) await fetchAllBeneficiaries();
+            if(allDeliveriesGlobal.length === 0) await fetchAllDeliveries();
+            
+            const today = new Date().toISOString().split('T')[0];
+            const filterItem = document.getElementById('reportItemName').value.trim().toLowerCase();
+            
+            let allDeliveriesIdsToday = [];
+            allDeliveriesGlobal.forEach((data) => { 
+                if(data.system_date === today) {
+                    if(filterItem === "" || (data.item_name && data.item_name.toLowerCase().includes(filterItem))) {
+                        allDeliveriesIdsToday.push(data.card_id);
+                    }
+                }
+            });
+
+            const selCat = document.getElementById('reportCategory').value;
+            let targetList = (selCat === "الكل") ? allBeneficiaries : allBeneficiaries.filter(b => b.category && b.category.includes(selCat));
+
+            let doneCount = 0; missedListForExport = [];
+            targetList.forEach(b => { if(allDeliveriesIdsToday.includes(b.card_id)) doneCount++; else missedListForExport.push(b); });
+
+            document.getElementById('rep-target').innerText = targetList.length;
+            document.getElementById('rep-done').innerText = doneCount;
+            document.getElementById('rep-missed').innerText = missedListForExport.length;
+
+            let tableHtml = "";
+            if(missedListForExport.length === 0) tableHtml = `<tr><td colspan="4" style="text-align:center; color:green; font-weight:bold;">الجميع استلموا!</td></tr>`;
+            else missedListForExport.forEach(b => { tableHtml += `<tr><td>${b.card_id}</td><td style="font-weight:bold;">${b.name}</td><td>${b.category}</td><td dir="ltr">${b.phone || '-'}</td></tr>`; });
+            document.getElementById('missedTableBody').innerHTML = tableHtml;
+        };
+
+        window.exportToExcel = function() {
+            if(missedListForExport.length === 0) return alert("لا يوجد بيانات لتصديرها.");
+            const worksheet = XLSX.utils.json_to_sheet(missedListForExport.map(b => ({ "الرقم": b.card_id, "الاسم": b.name, "الفئة": b.category, "الجوال": b.phone })));
+            const workbook = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(workbook, worksheet, "التقرير");
+            XLSX.writeFile(workbook, `تقرير_الجمعية_${new Date().toISOString().split('T')[0]}.xlsx`);
+        };
+
+        window.loadStats = async function() {
+            document.getElementById('tablesContainer').innerHTML = "<div style='text-align:center; padding:30px; font-weight:bold;'>⏳ جاري تحميل البيانات...</div>";
+            try {
+                await fetchAllBeneficiaries();
+                let stats = { total: 0, orphans: 0, widows: 0, divorced: 0, poor: 0, special: 0 };
+                allBeneficiaries.forEach((data) => {
+                    stats.total++; const cat = data.category || "";
+                    if(cat.includes('ايتام')) stats.orphans++;
+                    else if(cat.includes('ارملة') || cat.includes('ارامل')) stats.widows++;
+                    else if(cat.includes('مطلقة')) stats.divorced++;
+                    else if(cat.includes('فقير') || cat.includes('فقراء')) stats.poor++;
+                    else if(cat.includes('إعاقة') || cat.includes('اعاقة')) stats.special++;
+                });
+                document.getElementById('stat-total').innerText = stats.total; document.getElementById('stat-orphans').innerText = stats.orphans;
+                document.getElementById('stat-widows').innerText = stats.widows; document.getElementById('stat-divorced').innerText = stats.divorced;
+                document.getElementById('stat-poor').innerText = stats.poor; document.getElementById('stat-special').innerText = stats.special;
+
+                drawChart(stats); buildTables(allBeneficiaries);
+            } catch (e) {}
+        };
+
+        function drawChart(stats) {
+            const ctx = document.getElementById('categoryChart').getContext('2d');
+            if(myChart) myChart.destroy();
+            myChart = new Chart(ctx, {
+                type: 'doughnut', data: { labels: ['أيتام', 'أرامل', 'مطلقات', 'فقير', 'إعاقة'], datasets: [{ data: [stats.orphans, stats.widows, stats.divorced, stats.poor, stats.special], backgroundColor: ['#e83e8c', '#6f42c1', '#fd7e14', '#10b981', '#3b82f6'] }] },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        }
+
+        window.filterTables = function() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = (query==="") ? allBeneficiaries : allBeneficiaries.filter(b => (b.name && b.name.toLowerCase().includes(query)) || (b.card_id && b.card_id.includes(query)));
+            buildTables(filtered);
+        };
+
+        function buildTables(dataList) {
+            const container = document.getElementById('tablesContainer'); container.innerHTML = "";
+            ['ايتام', 'ارملة', 'مطلقة', 'فقير', 'إعاقة'].forEach(cat => {
+                const catData = dataList.filter(b => {
+                    const bc = b.category || "";
+                    if(cat === 'فقير') return bc.includes('فقير') || bc.includes('فقراء');
+                    if(cat === 'إعاقة') return bc.includes('إعاقة') || bc.includes('اعاقة');
+                    return bc.includes(cat);
+                });
+                let html = `<div id="table-${cat}" class="category-table ${cat==='ايتام'?'active':''}"><table><tr><th>الرقم</th><th>الاسم</th><th>الجوال</th></tr>`;
+                catData.forEach(b => { html += `<tr><td>${b.card_id}</td><td style="font-weight:bold;">${b.name}</td><td dir="ltr">${b.phone || '-'}</td></tr>`; });
+                html += `</table></div>`; container.innerHTML += html;
+            });
+            const activeTab = document.querySelector('#dashboardPage .tab-btn.active');
+            if(activeTab) showCategoryTable(activeTab.innerText.includes('أرامل')?'ارملة':activeTab.innerText.includes('مطلقات')?'مطلقة':activeTab.innerText.includes('فقير')?'فقير':activeTab.innerText.includes('إعاقة')?'إعاقة':'ايتام', activeTab);
+        }
+
+        window.showCategoryTable = function(cat, btn) {
+            document.querySelectorAll('#dashboardPage .tab-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active');
+            document.querySelectorAll('#dashboardPage .category-table').forEach(t => t.classList.remove('active')); document.getElementById(`table-${cat}`).classList.add('active');
+        };
+
+        // --- رفع الإكسل ---
+        document.getElementById('fileUpload').addEventListener('change', async function(e) {
+            const file = e.target.files[0]; if (!file) return;
+            if(!confirm("⚠️ سيتم مسح بيانات المستفيدين واستبدالها! متابعة؟")) { e.target.value = ""; return; }
+            const statusDiv = document.getElementById('uploadStatus'); statusDiv.innerHTML = "جاري الرفع...";
+            try {
+                const q = query(collection(db, "beneficiaries")); const qs = await getDocs(q);
+                const dp = []; qs.forEach((doc) => dp.push(deleteDoc(doc(db, "beneficiaries", doc.id)))); await Promise.all(dp);
+                const reader = new FileReader();
+                reader.onload = async function(e) {
+                    const data = new Uint8Array(e.target.result); const workbook = XLSX.read(data, {type: 'array'}); const json_data = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
+                    let successCount = 0;
+                    for (let row of json_data) {
+                        const cardId = String(row['مسلسل']).trim(); if(!cardId || cardId === "undefined") continue;
+                        let cat = String(row['الحالة العائلية']).trim() || ""; if(cat.includes('فقراء')) cat = 'فقير'; if(cat.includes('احتياجات')) cat = 'إعاقة';
+                        await setDoc(doc(collection(db, "beneficiaries"), cardId), { card_id: cardId, name: row['اسم المستفيد الثلاثي'] || "", category: cat, phone: row['رقم الجوال']?String(row['رقم الجوال']):"" }); successCount++;
+                        if(successCount%10===0) statusDiv.innerHTML=`الرفع: ${successCount}`;
+                    }
+                    statusDiv.innerHTML = `✅ اكتمل الرفع! (${successCount})`; playSound('success'); loadStats();
+                }; reader.readAsArrayBuffer(file);
+            } catch(e) { statusDiv.innerHTML = "خطأ."; }
+        });
+    </script>
+</body>
+</html>
