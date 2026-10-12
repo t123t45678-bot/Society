@@ -26,7 +26,7 @@
             font-size: 18px; 
         }
         
-        /* تأثير الزجاج اللطيف (Glassmorphism) */
+        /* تأثير الزجاج اللطيف */
         .glass-panel {
             background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(10px);
@@ -87,11 +87,8 @@
         .tab-btn { flex: 1; min-width: 120px; padding: 15px; background: white; border: 2px solid #cbd5e1; border-radius: 12px; cursor: pointer; font-weight: 800; font-size: 20px; color: #475569; transition: 0.3s; }
         .tab-btn.active { background: var(--accent); border-color: var(--accent); color: white; box-shadow: 0 8px 15px rgba(37, 99, 235, 0.25);}
         
-        /* تنسيقات خاصة بحملة التوزيع */
         .campaign-badge { display: inline-block; background: var(--accent); color: white; padding: 5px 15px; border-radius: 20px; font-size: 16px; font-weight: bold; margin-bottom: 10px; }
         .campaign-closed-msg { display: none; text-align: center; padding: 50px 20px; background: #fef2f2; border: 3px dashed var(--danger); border-radius: 20px; color: var(--danger); font-size: 26px; font-weight: 900; }
-        
-        /* تنسيقات الشيك بوكس (Checkbox) */
         .sms-checkbox { width: 25px; height: 25px; cursor: pointer; accent-color: var(--accent); }
     </style>
 </head>
@@ -124,7 +121,7 @@
             <button class="nav-btn active" onclick="switchPage('scannerPage', this)"><i class="fas fa-qrcode"></i> شاشة التوزيع</button>
             <button class="nav-btn admin-only" onclick="switchPage('smsPage', this); loadSmsData();"><i class="fas fa-sms"></i> بوابة الرسائل (SMS)</button>
             <button class="nav-btn admin-only" onclick="switchPage('archivePage', this); loadArchiveCategory('ايتام', document.getElementById('tab-arch-1'));"><i class="fas fa-folder-open"></i> الأرشيف</button>
-            <button class="nav-btn admin-only" onclick="switchPage('reportsPage', this); loadDistributionReport();"><i class="fas fa-list-alt"></i> التقارير</button>
+            <button class="nav-btn admin-only" onclick="switchPage('reportsPage', this); setupReportsFilters();"><i class="fas fa-list-alt"></i> التقارير</button>
             <button class="nav-btn admin-only" onclick="switchPage('dashboardPage', this); loadStats();"><i class="fas fa-chart-pie"></i> الإحصائيات</button>
             <button class="nav-btn admin-only" onclick="switchPage('settingsPage', this)"><i class="fas fa-cog"></i> الإعدادات</button>
         </div>
@@ -149,7 +146,7 @@
                         </div>
                         <div style="flex: 1; min-width: 250px; text-align: right;">
                             <label style="color: white; font-weight: 800; margin-bottom: 10px; display: block;">2. المواد الموزعة (افصل بفاصلة إذا كانت أكثر من مادة):</label>
-                            <input type="text" id="adminCampaignItems" placeholder="مثال: لحمة, سلة غذائية, مبالغ نقدية" style="border-color: var(--gold);">
+                            <input type="text" id="adminCampaignItems" placeholder="مثال: لحمة, سلة غذائية, مال" style="border-color: var(--gold);">
                         </div>
                     </div>
                     <div style="margin-top: 15px;">
@@ -167,7 +164,7 @@
                 <div id="volunteerActiveSection" style="display: none;">
                     <div style="background: #f8fafc; padding: 35px; border-radius: 25px; border: 2px dashed #cbd5e1; text-align: center;">
                         <div style="background: white; padding: 25px; border-radius: 20px; margin-bottom: 25px; box-shadow: 0 8px 15px rgba(0,0,0,0.05); text-align: right;">
-                            <div class="campaign-badge">الحملة نشطة الآن</div>
+                            <div class="campaign-badge">الحملة نشطة الآن - رقم <span id="volActiveCampId"></span></div>
                             <h4 style="margin-top: 0; color: var(--primary); font-size: 26px; font-weight: 900;">إعدادات التوزيع المفروضة من الإدارة:</h4>
                             <p style="font-size: 22px; font-weight: 800; color: var(--success); border-bottom: 1px solid #e2e8f0; padding-bottom: 15px;">
                                 <i class="fas fa-users"></i> الفئة المسموحة: <span id="volActiveCatDisplay" style="color:var(--primary);">جاري التحميل...</span>
@@ -186,7 +183,7 @@
                 </div>
             </div>
 
-            <!-- ================= 2. بوابة إرسال الرسائل (SMS) الجديدة ================= -->
+            <!-- ================= 2. بوابة الـ SMS ================= -->
             <div id="smsPage" class="page-section glass-panel">
                 <h2 style="color: var(--primary); font-size: 32px; font-weight: 900; margin-bottom: 30px;">بوابة الإرسال المركزي للرسائل النصية (SMS)</h2>
                 
@@ -220,14 +217,12 @@
                     <table id="smsTable">
                         <thead>
                             <tr>
-                                <th style="width: 50px; text-align: center;">
-                                    <input type="checkbox" id="selectAllSms" class="sms-checkbox" onchange="toggleSelectAllSms()">
-                                </th>
+                                <th style="width: 50px; text-align: center;"><input type="checkbox" id="selectAllSms" class="sms-checkbox" onchange="toggleSelectAllSms()"></th>
                                 <th>رقم البطاقة</th>
                                 <th>الاسم الكامل</th>
                                 <th>الفئة</th>
                                 <th>الجوال</th>
-                                <th>حالة الرسالة (مباشر)</th>
+                                <th>حالة الرسالة</th>
                                 <th>إجراء فردي</th>
                             </tr>
                         </thead>
@@ -259,31 +254,28 @@
                 </div>
             </div>
 
-            <!-- ================= 4. التقارير ================= -->
+            <!-- ================= 4. التقارير المعدلة ================= -->
             <div id="reportsPage" class="page-section glass-panel">
-                <h2 style="color: var(--primary); font-size: 32px; font-weight: 900; margin-bottom: 30px;">التقارير اليومية والإحصاء</h2>
-                <div style="background: white; padding: 25px; border-radius: 20px; margin-bottom: 30px; display: flex; gap: 20px; flex-wrap: wrap; border: 2px solid #e2e8f0;">
-                    <div style="flex: 1; min-width: 250px;">
-                        <label style="font-weight: 900; font-size: 20px; margin-bottom: 10px; display: block;">تصفية حسب الفئة:</label>
-                        <select id="reportCategory" onchange="loadDistributionReport()"><option value="الكل">الجميع</option><option value="ايتام">أيتام</option><option value="ارملة">أرامل</option><option value="مطلقة">مطلقات</option><option value="فقير">فقراء</option><option value="إعاقة">إعاقة</option></select>
-                    </div>
-                    <div style="flex: 1; min-width: 250px;">
-                        <label style="font-weight: 900; font-size: 20px; margin-bottom: 10px; display: block;">تصفية حسب المادة:</label>
-                        <input type="text" id="reportItemName" placeholder="مثال: لحمة" onkeyup="loadDistributionReport()">
-                    </div>
+                <h2 style="color: var(--primary); font-size: 32px; font-weight: 900; margin-bottom: 30px;">تقارير الحملات والتوزيعات</h2>
+                <div style="background: white; padding: 25px; border-radius: 20px; margin-bottom: 30px; border: 2px solid #e2e8f0;">
+                    <label style="font-weight: 900; font-size: 22px; margin-bottom: 15px; display: block; color: var(--primary);">اختر التوزيع لإنشاء التقرير:</label>
+                    <select id="reportCampaignSelect" onchange="generateReportData()" style="border-color: var(--accent); font-size: 20px; background: #f8fafc;">
+                        <option value="">جاري جلب التوزيعات السابقة...</option>
+                    </select>
                 </div>
+                
                 <div class="tab-buttons" style="margin-bottom: 30px;">
-                    <button id="btnTabMissed" class="tab-btn active" style="font-size: 22px;" onclick="switchReportTab('missed')">غير المستلمين (<span id="rep-missed">0</span>)</button>
-                    <button id="btnTabDone" class="tab-btn" style="font-size: 22px;" onclick="switchReportTab('done')">المستلمين (<span id="rep-done">0</span>)</button>
+                    <button id="btnTabMissed" class="tab-btn active" style="font-size: 22px;" onclick="switchReportTab('missed')">غير المستلمين لهذه المادة (<span id="rep-missed">0</span>)</button>
+                    <button id="btnTabDone" class="tab-btn" style="font-size: 22px;" onclick="switchReportTab('done')">المستلمين لهذه المادة (<span id="rep-done">0</span>)</button>
                 </div>
                 <div style="display: flex; justify-content: space-between; margin-bottom: 20px; align-items: center; flex-wrap: wrap;">
                     <h3 id="reportTitle" style="color: var(--danger); margin: 0; font-size: 28px; font-weight: 900;">قائمة بأسماء غير المستلمين:</h3>
-                    <button class="btn btn-success" onclick="exportToExcel()">تصدير لملف Excel</button>
+                    <button class="btn btn-success" onclick="exportToExcel()">تصدير لملف Excel <i class="fas fa-file-excel"></i></button>
                 </div>
                 <div class="table-container">
                     <table id="reportTable">
                         <thead><tr><th>رقم البطاقة</th><th>الاسم الكامل</th><th>الفئة</th><th>الجوال</th><th id="thTime" style="display:none;">تاريخ التسليم والمادة</th></tr></thead>
-                        <tbody id="reportTableBody"><tr><td colspan="5" style="text-align:center; padding: 40px; font-weight: 900;">جاري التجهيز...</td></tr></tbody>
+                        <tbody id="reportTableBody"><tr><td colspan="5" style="text-align:center; padding: 40px; font-weight: 900;">اختر حملة لعرض التقرير...</td></tr></tbody>
                     </table>
                 </div>
             </div>
@@ -318,12 +310,34 @@
 
             <!-- ================= 6. الإعدادات ================= -->
             <div id="settingsPage" class="page-section glass-panel">
-                <h2 style="color: var(--primary); font-size: 32px; font-weight: 900; margin-bottom: 30px;">تحديث قاعدة المستفيدين</h2>
-                <div style="border: 4px dashed var(--danger); padding: 60px 30px; border-radius: 25px; text-align: center; background: #fef2f2;">
-                    <p style="font-size: 24px; font-weight: 900; color: #991b1b; margin-bottom: 30px;">تحذير: رفع ملف جديد سيمسح جميع الأسماء الحالية.</p>
-                    <label for="fileUpload" class="btn btn-danger" style="font-size: 24px; padding: 20px 50px;">اختيار ملف Excel للرفع</label>
+                <h2 style="color: var(--primary); font-size: 32px; font-weight: 900; margin-bottom: 30px;">الإعدادات وقاعدة البيانات</h2>
+                
+                <!-- القسم الجديد: إضافة عائلة يدوياً -->
+                <div style="background: white; padding: 30px; border-radius: 20px; border: 2px solid var(--accent); margin-bottom: 40px;">
+                    <h3 style="color: var(--accent); margin-top: 0; font-size: 24px;"><i class="fas fa-user-plus"></i> إضافة مستفيد يدوياً (إدخال مباشر)</h3>
+                    <p style="color: #64748b; margin-bottom: 20px;">استخدم هذا القسم لإضافة عائلة جديدة دون الحاجة لرفع ملف وحذف البيانات القديمة.</p>
+                    <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                        <input type="text" id="manualCardId" placeholder="رقم البطاقة" style="flex: 1; min-width: 200px;">
+                        <input type="text" id="manualName" placeholder="الاسم الكامل" style="flex: 2; min-width: 250px;">
+                        <select id="manualCategory" style="flex: 1; min-width: 150px;">
+                            <option value="ايتام">أيتام</option>
+                            <option value="ارملة">أرامل</option>
+                            <option value="مطلقة">مطلقات</option>
+                            <option value="فقير">فقراء</option>
+                            <option value="إعاقة">إعاقة</option>
+                        </select>
+                        <input type="text" id="manualPhone" placeholder="الجوال (اختياري)" style="flex: 1; min-width: 200px;">
+                    </div>
+                    <button class="btn btn-primary" onclick="addManualBeneficiary()" style="width: 100%; font-size: 22px; margin-top: 10px;"><i class="fas fa-save"></i> حفظ المستفيد في القاعدة</button>
+                </div>
+
+                <!-- قسم الرفع القديم -->
+                <div style="border: 4px dashed var(--danger); padding: 40px 30px; border-radius: 25px; text-align: center; background: #fef2f2;">
+                    <h3 style="color: var(--danger); margin-top: 0;"><i class="fas fa-exclamation-triangle"></i> تحديث شامل (رفع ملف إكسل)</h3>
+                    <p style="font-size: 20px; font-weight: 900; color: #991b1b; margin-bottom: 30px;">تحذير: رفع ملف جديد سيمسح جميع الأسماء الحالية نهائياً ويستبدلها بالملف الجديد.</p>
+                    <label for="fileUpload" class="btn btn-danger" style="font-size: 24px; padding: 15px 40px;">اختيار ملف Excel للرفع</label>
                     <input type="file" id="fileUpload" accept=".xlsx, .xls" style="display: none;" />
-                    <div id="uploadStatus" style="margin-top: 30px; font-weight: 900; font-size: 22px;"></div>
+                    <div id="uploadStatus" style="margin-top: 20px; font-weight: 900; font-size: 22px;"></div>
                 </div>
             </div>
 
@@ -332,7 +346,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getFirestore, collection, setDoc, doc, getDoc, getDocs, deleteDoc, query, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import { getFirestore, collection, setDoc, doc, getDoc, getDocs, deleteDoc, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyA1GTSVUrUJXjNU0m6cRFCgswpmHYPg3A0",
@@ -356,8 +370,7 @@
         let currentUserRole = ""; 
         let currentArchiveCategoryData = []; 
         
-        // متغيرات الحملة والـ SMS
-        let activeCampaign = { isOpen: false, category: 'الكل', items: [] };
+        let activeCampaign = { isOpen: false, category: 'الكل', items: [], campaign_id: 0 };
         let smsRealTimeData = [];
         let unsubscribeSms = null;
 
@@ -392,13 +405,14 @@
             if (pageId !== 'scannerPage' && html5QrCode) { try { html5QrCode.stop(); document.getElementById('reader').style.display='none'; } catch(e){} }
         };
 
-        // --- إدارة الحملة المركزية ---
+        // --- إدارة الحملة المركزية وترقيمها ---
         window.listenToCampaign = function() {
             onSnapshot(doc(db, "settings", "distribution_session"), (docSnap) => {
                 if (docSnap.exists()) {
                     activeCampaign = docSnap.data();
                     if(!activeCampaign.items) activeCampaign.items = [];
-                } else activeCampaign = { isOpen: false, category: 'الكل', items: [] };
+                    if(!activeCampaign.campaign_id) activeCampaign.campaign_id = 0;
+                } else activeCampaign = { isOpen: false, category: 'الكل', items: [], campaign_id: 0 };
                 updateCampaignUI();
             });
         };
@@ -410,6 +424,7 @@
                 closedMsg.style.display = 'none'; activeSection.style.display = 'block';
                 let catText = activeCampaign.category === 'الكل' ? 'السماح لجميع الفئات' : activeCampaign.category;
                 document.getElementById('volActiveCatDisplay').innerText = catText;
+                document.getElementById('volActiveCampId').innerText = activeCampaign.campaign_id;
                 const select = document.getElementById('volItemSelect'); select.innerHTML = '';
                 if(activeCampaign.items && activeCampaign.items.length > 0) {
                     activeCampaign.items.forEach(item => { select.innerHTML += `<option value="${item}">${item}</option>`; });
@@ -425,9 +440,17 @@
             const itemsStr = document.getElementById('adminCampaignItems').value;
             if(!itemsStr.trim()) return alert("الرجاء كتابة اسم مادة واحدة على الأقل لإطلاق الحملة!");
             const itemsArray = itemsStr.split(',').map(item => item.trim()).filter(item => item !== "");
+            
             try {
-                await setDoc(doc(db, "settings", "distribution_session"), { isOpen: true, category: cat, items: itemsArray });
-                alert("تم إطلاق الحملة بنجاح!");
+                // قراءة العداد العام للحملات لزيادته
+                const counterRef = doc(db, "settings", "campaign_counter");
+                const counterSnap = await getDoc(counterRef);
+                let currentId = 1;
+                if(counterSnap.exists()) currentId = (counterSnap.data().last_id || 0) + 1;
+                
+                await setDoc(counterRef, { last_id: currentId });
+                await setDoc(doc(db, "settings", "distribution_session"), { isOpen: true, category: cat, items: itemsArray, campaign_id: currentId });
+                alert(`تم إطلاق الحملة بنجاح! رقم التوزيع هو: ${currentId}`);
             } catch(e) { alert("خطأ اتصال."); }
         };
         window.stopCampaign = async function() {
@@ -435,42 +458,68 @@
             catch(e) { alert("خطأ اتصال."); }
         };
 
-        // --- نظام التوزيع (الكاميرا) ---
+        // --- نظام التوزيع والاحتفاظ بـ 3 توزيعات فقط ---
         window.checkBeneficiary = async function(qrText) {
             const resultBox = document.getElementById('resultBox'); const resultText = document.getElementById('resultText');
             document.getElementById('loadingScanner').style.display = 'block';
             let scannedCardId = qrText.trim(); const match = qrText.match(/رقم البطاقة:\s*(\d+)/); if (match && match[1]) scannedCardId = match[1];
             const selectedCat = activeCampaign.category; const itemName = document.getElementById('volItemSelect').value;
+            const campId = activeCampaign.campaign_id;
 
             try {
                 const docRef = doc(db, "beneficiaries", scannedCardId); const docSnap = await getDoc(docRef);
+                
+                if (!docSnap.exists()) {
+                    document.getElementById('loadingScanner').style.display = 'none'; resultBox.style.display = 'block';
+                    resultBox.style.background = "linear-gradient(135deg, var(--danger), #991b1b)"; resultText.innerHTML = `البطاقة غير معرفة في النظام`; playSound('error');
+                    return;
+                }
+
+                const data = docSnap.data(); const benCat = data.category || "";
+                if (selectedCat !== "الكل" && !benCat.includes(selectedCat)) {
+                    document.getElementById('loadingScanner').style.display = 'none'; resultBox.style.display = 'block';
+                    resultBox.style.background = "linear-gradient(135deg, var(--danger), #991b1b)";
+                    resultText.innerHTML = `مرفوض<br><span style="font-size:20px;">هذه الحملة مخصصة لفئة (${selectedCat}) فقط</span><br>${data.name}`;
+                    playSound('error'); return;
+                }
+                
+                // التأكد من عدم الاستلام مسبقاً في نفس الحملة (رقم التوزيع)
+                const deliveryId = `${scannedCardId}_camp_${campId}_${itemName}`;
+                const deliveryRef = doc(db, "deliveries", deliveryId); const deliverySnap = await getDoc(deliveryRef);
+
                 document.getElementById('loadingScanner').style.display = 'none'; resultBox.style.display = 'block';
 
-                if (docSnap.exists()) {
-                    const data = docSnap.data(); const benCat = data.category || "";
-                    if (selectedCat !== "الكل" && !benCat.includes(selectedCat)) {
-                        resultBox.style.background = "linear-gradient(135deg, var(--danger), #991b1b)";
-                        resultText.innerHTML = `مرفوض<br><span style="font-size:20px;">هذه الحملة مخصصة لفئة (${selectedCat}) فقط</span><br>${data.name}`;
-                        playSound('error'); return;
-                    }
-                    const today = new Date().toISOString().split('T')[0]; const deliveryId = `${scannedCardId}_${today}_${itemName}`;
-                    const deliveryRef = doc(db, "deliveries", deliveryId); const deliverySnap = await getDoc(deliveryRef);
-
-                    if (deliverySnap.exists()) {
-                        resultBox.style.background = "linear-gradient(135deg, var(--warning), #b45309)";
-                        resultText.innerHTML = `مرفوض<br><span style="font-size:20px;">لقد استلم مادة (${itemName}) مسبقاً اليوم</span><br>${data.name}`;
-                        playSound('error');
-                    } else {
-                        const timestamp = new Date().toLocaleString('ar-EG');
-                        await setDoc(deliveryRef, { card_id: scannedCardId, name: data.name, date: timestamp, category: benCat, item_name: itemName, system_date: today });
-                        resultBox.style.background = "linear-gradient(135deg, var(--success), #047857)";
-                        resultText.innerHTML = `تم التسليم بنجاح<br><span style="font-size:26px; color:#d1fae5; font-weight:900;">[ ${itemName} ]</span><br>${data.name}`;
-                        playSound('success');
-                    }
+                if (deliverySnap.exists()) {
+                    resultBox.style.background = "linear-gradient(135deg, var(--warning), #b45309)";
+                    resultText.innerHTML = `مرفوض<br><span style="font-size:20px;">لقد استلم مادة (${itemName}) في التوزيع رقم ${campId} مسبقاً</span><br>${data.name}`;
+                    playSound('error');
                 } else {
-                    resultBox.style.background = "linear-gradient(135deg, var(--danger), #991b1b)"; resultText.innerHTML = `البطاقة غير معرفة في النظام`; playSound('error');
+                    const timestamp = new Date().toLocaleString('ar-EG');
+                    const timeMs = Date.now();
+                    // تخزين الاستلام مع رقم الحملة
+                    await setDoc(deliveryRef, { card_id: scannedCardId, name: data.name, date: timestamp, timestamp_ms: timeMs, category: benCat, item_name: itemName, campaign_id: campId });
+                    
+                    // --- دالة حذف القديم للحفاظ على آخر 3 توزيعات فقط ---
+                    const qUserDel = query(collection(db, "deliveries"), where("card_id", "==", scannedCardId));
+                    const userDelSnap = await getDocs(qUserDel);
+                    let userDeliveries = [];
+                    userDelSnap.forEach(d => userDeliveries.push({...d.data(), docId: d.id}));
+                    
+                    if(userDeliveries.length > 3) {
+                        // ترتيب تنازلي حسب الوقت
+                        userDeliveries.sort((a,b) => (b.timestamp_ms || 0) - (a.timestamp_ms || 0));
+                        // حذف ما بعد الثالث
+                        for(let i=3; i<userDeliveries.length; i++) {
+                            await deleteDoc(doc(db, "deliveries", userDeliveries[i].docId));
+                        }
+                    }
+                    // ----------------------------------------------------
+
+                    resultBox.style.background = "linear-gradient(135deg, var(--success), #047857)";
+                    resultText.innerHTML = `تم التسليم بنجاح<br><span style="font-size:26px; color:#d1fae5; font-weight:900;">[ ${itemName} ]</span><br>${data.name}`;
+                    playSound('success');
                 }
-            } catch (error) { document.getElementById('loadingScanner').style.display = 'none'; resultBox.style.background = "var(--danger)"; resultText.innerHTML = "خطأ اتصال بالشبكة"; playSound('error'); }
+            } catch (error) { document.getElementById('loadingScanner').style.display = 'none'; resultBox.style.display = 'block'; resultBox.style.background = "var(--danger)"; resultText.innerHTML = "خطأ اتصال بالشبكة"; playSound('error'); }
         };
 
         window.startScanner = function() {
@@ -484,44 +533,49 @@
         };
         window.resetScanner = function() { document.getElementById('resultBox').style.display = 'none'; window.startScanner(); };
 
-        // ================= الأكواد الخاصة ببوابة الـ SMS =================
+        // --- إضافة مستفيد يدوياً ---
+        window.addManualBeneficiary = async function() {
+            const id = document.getElementById('manualCardId').value.trim();
+            const name = document.getElementById('manualName').value.trim();
+            const cat = document.getElementById('manualCategory').value;
+            const phone = document.getElementById('manualPhone').value.trim();
+            
+            if(!id || !name) return alert("يجب إدخال رقم البطاقة والاسم على الأقل.");
+            
+            try {
+                await setDoc(doc(db, "beneficiaries", id), { card_id: id, name: name, category: cat, phone: phone });
+                alert("تم إضافة المستفيد بنجاح دون التأثير على البيانات القديمة!");
+                document.getElementById('manualCardId').value = ''; document.getElementById('manualName').value = ''; document.getElementById('manualPhone').value = '';
+                if(currentUserRole === 'admin') { await fetchAllBeneficiaries(); loadStats(); }
+            } catch(e) { alert("حدث خطأ في الإضافة."); }
+        };
+
+        // --- بوابة الـ SMS ---
         window.loadSmsData = function() {
             if (unsubscribeSms) unsubscribeSms();
             const q = query(collection(db, "beneficiaries"));
-            
-            // الاستماع المباشر للتغييرات لعرض حالة الرسالة فوراً
             unsubscribeSms = onSnapshot(q, (snapshot) => {
                 smsRealTimeData = [];
                 snapshot.forEach(doc => smsRealTimeData.push(doc.data()));
-                filterSmsTable(); // تحديث الجدول تلقائياً عند أي تغيير
+                filterSmsTable();
             });
         };
-
         window.filterSmsTable = function() {
             const cat = document.getElementById('smsCategoryFilter').value;
             const search = document.getElementById('smsSearchInput').value.toLowerCase();
-            
             let filtered = smsRealTimeData.filter(b => {
                 const matchCat = cat === 'الكل' || (b.category && b.category.includes(cat));
                 const matchSearch = (b.name && b.name.toLowerCase().includes(search)) || (b.card_id && b.card_id.includes(search));
                 return matchCat && matchSearch;
             });
-            
             renderSmsTable(filtered);
         };
-
         window.renderSmsTable = function(list) {
             const tbody = document.getElementById('smsTableBody');
-            if (list.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding: 40px; font-weight: 900;">لا توجد أسماء مطابقة</td></tr>`;
-                return;
-            }
+            if (list.length === 0) { tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding: 40px; font-weight: 900;">لا توجد أسماء مطابقة</td></tr>`; return; }
             let html = '';
             list.forEach(b => {
-                let statusText = 'لم يتم الإرسال';
-                let statusColor = '#64748b'; // سكني
-                
-                // تحديد شكل وحالة الرسالة بناءً على قاعدة البيانات
+                let statusText = 'لم يتم الإرسال'; let statusColor = '#64748b';
                 if (b.sms_status === 'pending') { statusText = 'قيد الانتظار... ⏳'; statusColor = 'var(--warning)'; }
                 else if (b.sms_status === 'sent') { statusText = 'تم الإرسال بنجاح ✔️'; statusColor = 'var(--success)'; }
                 else if (b.sms_status === 'failed') { statusText = 'فشل الإرسال ❌'; statusColor = 'var(--danger)'; }
@@ -534,111 +588,130 @@
                     <td><span class="campaign-badge" style="font-size:14px; background:var(--secondary);">${b.category || '-'}</span></td>
                     <td dir="ltr" style="font-weight: 900;">${b.phone || '-'}</td>
                     <td style="color:${statusColor}; font-weight:900; font-size: 18px;">${statusText}</td>
-                    <td>
-                        <button class="btn btn-primary" style="padding: 10px 20px; font-size: 18px;" onclick="sendSingleSms('${b.card_id}')" title="إرسال رسالة لهذا الشخص فقط">
-                            إرسال <i class="fas fa-paper-plane"></i>
-                        </button>
-                    </td>
+                    <td><button class="btn btn-primary" style="padding: 10px 20px; font-size: 18px;" onclick="sendSingleSms('${b.card_id}')">إرسال <i class="fas fa-paper-plane"></i></button></td>
                 </tr>`;
             });
             tbody.innerHTML = html;
         };
+        window.toggleSelectAllSms = function() { const isChecked = document.getElementById('selectAllSms').checked; document.querySelectorAll('.sms-checkbox').forEach(cb => cb.checked = isChecked); };
+        window.sendSingleSms = async function(cardId) { try { await setDoc(doc(db, "beneficiaries", cardId), { sms_status: 'pending' }, { merge: true }); playSound('success'); } catch(e) { alert('خطأ'); } };
+        window.sendSmsToSelected = async function() { const checkboxes = document.querySelectorAll('.sms-checkbox:checked'); if (checkboxes.length === 0) return alert('الرجاء تحديد شخص واحد على الأقل.'); for (let cb of checkboxes) { await setDoc(doc(db, "beneficiaries", cb.value), { sms_status: 'pending' }, { merge: true }); } playSound('success'); document.getElementById('selectAllSms').checked = false; };
+        window.sendSmsToAllFiltered = async function() { const currentCount = document.querySelectorAll('.sms-checkbox').length; if (currentCount === 0) return; if (!confirm(`إرسال لـ (${currentCount}) شخص؟`)) return; const checkboxes = document.querySelectorAll('.sms-checkbox'); for (let cb of checkboxes) { await setDoc(doc(db, "beneficiaries", cb.value), { sms_status: 'pending' }, { merge: true }); } playSound('success'); };
 
-        window.toggleSelectAllSms = function() {
-            const isChecked = document.getElementById('selectAllSms').checked;
-            document.querySelectorAll('.sms-checkbox').forEach(cb => cb.checked = isChecked);
-        };
-
-        // دالة تغيير حالة المستفيد إلى "قيد الانتظار" ليلتقطها تطبيق الجوال (Flutter)
-        window.sendSingleSms = async function(cardId) {
-            try {
-                await setDoc(doc(db, "beneficiaries", cardId), { sms_status: 'pending' }, { merge: true });
-                playSound('success');
-            } catch(e) { alert('حدث خطأ في الاتصال بقاعدة البيانات.'); }
-        };
-
-        window.sendSmsToSelected = async function() {
-            const checkboxes = document.querySelectorAll('.sms-checkbox:checked');
-            if (checkboxes.length === 0) return alert('الرجاء تحديد شخص واحد على الأقل من الجدول.');
-            
-            for (let cb of checkboxes) {
-                await setDoc(doc(db, "beneficiaries", cb.value), { sms_status: 'pending' }, { merge: true });
-            }
-            playSound('success');
-            document.getElementById('selectAllSms').checked = false; // إلغاء التحديد بعد الإرسال
-        };
-
-        window.sendSmsToAllFiltered = async function() {
-            const currentCount = document.querySelectorAll('.sms-checkbox').length;
-            if (currentCount === 0) return;
-            if (!confirm(`هل أنت متأكد من إرسال أمر لتطبيق الجوال بإرسال رسائل لـ (${currentCount}) شخص معروضين في الجدول حالياً؟`)) return;
-            
-            const checkboxes = document.querySelectorAll('.sms-checkbox');
-            for (let cb of checkboxes) {
-                await setDoc(doc(db, "beneficiaries", cb.value), { sms_status: 'pending' }, { merge: true });
-            }
-            playSound('success');
-        };
-        // ===============================================================
-
-        // --- باقي الأكواد القديمة تعمل بشكل طبيعي ---
-        // الأرشيف
+        // --- الأرشيف ---
         async function fetchAllDeliveries() { const q = query(collection(db, "deliveries")); const qs = await getDocs(q); allDeliveriesGlobal = []; qs.forEach((doc) => allDeliveriesGlobal.push(doc.data())); }
+        async function fetchAllBeneficiaries() { const qs = await getDocs(collection(db, "beneficiaries")); allBeneficiaries = []; qs.forEach((doc) => allBeneficiaries.push(doc.data())); }
+        
         window.loadArchiveCategory = async function(catFilter, btn) { document.querySelectorAll('#archivePage .tab-btn').forEach(b => b.classList.remove('active')); if(btn) btn.classList.add('active'); document.getElementById('archiveNamesList').innerHTML = "جاري التحميل..."; document.getElementById('archiveDetailsContent').innerHTML = "اختر اسماً من القائمة الجانبية."; if(allBeneficiaries.length === 0) await fetchAllBeneficiaries(); if(allDeliveriesGlobal.length === 0) await fetchAllDeliveries(); currentArchiveCategoryData = allBeneficiaries.filter(b => { const bc = b.category || ""; if(catFilter === 'فقير') return bc.includes('فقير') || bc.includes('فقراء'); if(catFilter === 'إعاقة') return bc.includes('إعاقة') || bc.includes('اعاقة'); return bc.includes(catFilter); }); renderArchiveNames(currentArchiveCategoryData); };
         window.filterArchiveNames = function() { const query = document.getElementById('archiveSearchInput').value.toLowerCase(); renderArchiveNames(currentArchiveCategoryData.filter(b => b.name.toLowerCase().includes(query))); }
         function renderArchiveNames(list) { const listDiv = document.getElementById('archiveNamesList'); listDiv.innerHTML = ""; if(list.length === 0) { listDiv.innerHTML = "لا يوجد أسماء"; return; } list.forEach(b => { const btn = document.createElement('button'); btn.className = 'archive-name-btn'; btn.innerText = b.name; btn.style.display = "block"; btn.style.width = "100%"; btn.style.padding = "15px"; btn.style.marginBottom = "10px"; btn.style.border = "1px solid #e2e8f0"; btn.style.borderRadius = "10px"; btn.style.background = "#f8fafc"; btn.style.cursor = "pointer"; btn.style.fontWeight = "800"; btn.onclick = () => { document.querySelectorAll('.archive-name-btn').forEach(x => {x.style.background = "#f8fafc"; x.style.color="var(--text-main)";}); btn.style.background = "var(--accent)"; btn.style.color = "white"; showPersonArchive(b); }; listDiv.appendChild(btn); }); }
         function showPersonArchive(person) {
             const contentDiv = document.getElementById('archiveDetailsContent');
             const personHistory = allDeliveriesGlobal.filter(d => d.card_id === person.card_id);
-            const catDeliveries = allDeliveriesGlobal.filter(d => d.category === person.category);
-            const allItems = [...new Set(catDeliveries.map(d => d.item_name))]; 
-            const itemsTaken = [...new Set(personHistory.map(d => d.item_name))];
-            const itemsMissed = allItems.filter(item => !itemsTaken.includes(item));
-            let html = `<h3 style="color:var(--primary); font-size:28px; border-bottom:3px solid var(--gold); padding-bottom:15px;">${person.name} <br><span style="font-size:18px;">(${person.card_id})</span></h3>`;
-            html += `<h4 style="color:var(--success); text-align:right; font-size:24px;">سجل الاستلام:</h4><ul style="list-style:none; padding:0; text-align:right;">`;
-            if(personHistory.length === 0) html += `<li style="background:#f1f5f9; color:#64748b; padding:15px; border-radius:10px; margin-bottom:10px;">لم يستلم أي مادة.</li>`;
-            else { personHistory.sort((a,b) => new Date(b.date) - new Date(a.date)); personHistory.forEach(h => html += `<li style="background:#d1fae5; color:#065f46; padding:15px; border-radius:10px; margin-bottom:10px; display:flex; justify-content:space-between;"><span>${h.item_name}</span><span style="font-size:16px;">${h.date}</span></li>`); }
-            html += `</ul><h4 style="color:var(--danger); text-align:right; margin-top:35px; font-size:24px;">المواد الفائتة:</h4><ul style="list-style:none; padding:0; text-align:right;">`;
-            if(itemsMissed.length === 0) html += `<li style="background:#f1f5f9; color:#64748b; padding:15px; border-radius:10px; margin-bottom:10px;">استلم جميع مواد فئته.</li>`;
-            else itemsMissed.forEach(item => html += `<li style="background:#fee2e2; color:#991b1b; padding:15px; border-radius:10px; margin-bottom:10px; display:flex; justify-content:space-between;"><span>${item}</span><span style="font-size:16px;">لم يحضر</span></li>`);
+            let html = `<h3 style="color:var(--primary); font-size:28px; border-bottom:3px solid var(--gold); padding-bottom:15px;">${person.name} <br><span style="font-size:18px;">(${person.card_id}) - ${person.category || ''}</span></h3>`;
+            html += `<h4 style="color:var(--success); text-align:right; font-size:24px;">سجل الاستلام (آخر 3 توزيعات محفوظة):</h4><ul style="list-style:none; padding:0; text-align:right;">`;
+            if(personHistory.length === 0) html += `<li style="background:#f1f5f9; color:#64748b; padding:15px; border-radius:10px; margin-bottom:10px;">لم يستلم أي مادة أو تم حذف سجلاته القديمة.</li>`;
+            else { personHistory.sort((a,b) => (b.timestamp_ms || 0) - (a.timestamp_ms || 0)); personHistory.forEach(h => html += `<li style="background:#d1fae5; color:#065f46; padding:15px; border-radius:10px; margin-bottom:10px; display:flex; justify-content:space-between;"><span>${h.item_name} (رقم التوزيع: ${h.campaign_id || '-'})</span><span style="font-size:16px;">${h.date}</span></li>`); }
             html += `</ul>`; contentDiv.innerHTML = html;
         }
 
-        // التقارير والإحصائيات
-        async function fetchAllBeneficiaries() { const qs = await getDocs(collection(db, "beneficiaries")); allBeneficiaries = []; qs.forEach((doc) => allBeneficiaries.push(doc.data())); }
-        window.loadDistributionReport = async function() {
-            document.getElementById('reportTableBody').innerHTML = `<tr><td colspan="5" style="text-align:center; font-size:24px; font-weight:900; padding:40px;">جاري الحساب...</td></tr>`;
-            if(allBeneficiaries.length === 0) await fetchAllBeneficiaries(); await fetchAllDeliveries();
-            const today = new Date().toISOString().split('T')[0];
-            const filterItem = document.getElementById('reportItemName').value.trim().toLowerCase();
-            const selCat = document.getElementById('reportCategory').value;
-            let targetList = (selCat === "الكل") ? allBeneficiaries : allBeneficiaries.filter(b => b.category && b.category.includes(selCat));
-            missedListForExport = []; doneListForExport = [];
-            targetList.forEach(b => {
-                const delivery = allDeliveriesGlobal.find(d => d.system_date === today && d.card_id === b.card_id && (filterItem === "" || (d.item_name && d.item_name.toLowerCase().includes(filterItem))));
-                if(delivery) doneListForExport.push({ ...b, delivery_date: delivery.date, item_name: delivery.item_name }); else missedListForExport.push(b);
+        // --- التقارير المطورة وحل الإكسل ---
+        window.setupReportsFilters = async function() {
+            if(allBeneficiaries.length === 0) await fetchAllBeneficiaries();
+            await fetchAllDeliveries();
+            
+            const select = document.getElementById('reportCampaignSelect');
+            select.innerHTML = '';
+            
+            // استخراج التوزيعات المميزة من قاعدة البيانات (رقم التوزيع + اسم المادة)
+            let uniqueCampaigns = [];
+            allDeliveriesGlobal.forEach(d => {
+                let campStr = `${d.campaign_id || 'قديم'}_${d.item_name}`;
+                if(!uniqueCampaigns.find(x => x.val === campStr)) {
+                    uniqueCampaigns.push({ val: campStr, name: `توزيع رقم ${d.campaign_id || 'قديم'} - ${d.item_name}`, id: d.campaign_id || 0 });
+                }
             });
-            document.getElementById('rep-done').innerText = doneListForExport.length; document.getElementById('rep-missed').innerText = missedListForExport.length; renderReportTable();
+            
+            // ترتيب تنازلي ليكون آخر توزيع بالاعلى
+            uniqueCampaigns.sort((a,b) => b.id - a.id);
+            
+            if(uniqueCampaigns.length === 0) {
+                select.innerHTML = '<option value="">لا يوجد توزيعات مسجلة بعد</option>';
+            } else {
+                uniqueCampaigns.forEach(c => { select.innerHTML += `<option value="${c.val}">${c.name}</option>`; });
+                generateReportData(); // تشغيل التقرير لأول (آخر) توزيع تلقائياً
+            }
         };
+
+        window.generateReportData = function() {
+            const selValue = document.getElementById('reportCampaignSelect').value;
+            if(!selValue) return;
+            
+            let parts = selValue.split('_');
+            let targetCampId = parts[0];
+            let targetItem = parts[1];
+            
+            missedListForExport = []; doneListForExport = [];
+            
+            // من هم الأشخاص الذين استلموا هذه المادة في هذه الحملة؟
+            const deliveriesForThisCamp = allDeliveriesGlobal.filter(d => (d.campaign_id == targetCampId || (targetCampId === 'قديم' && !d.campaign_id)) && d.item_name === targetItem);
+            const receivedCardIds = deliveriesForThisCamp.map(d => String(d.card_id));
+            
+            // لمعرفة المرفوضين (الذين لم يستلموا)، يجب أن نعرف فئة التوزيع. (بشكل عام نعرض كل من لم يستلم)
+            allBeneficiaries.forEach(b => {
+                const bId = String(b.card_id);
+                if(receivedCardIds.includes(bId)) {
+                    const dDate = deliveriesForThisCamp.find(x => String(x.card_id) === bId).date;
+                    doneListForExport.push({ ...b, delivery_date: dDate, item_name: targetItem });
+                } else {
+                    missedListForExport.push(b);
+                }
+            });
+            
+            document.getElementById('rep-done').innerText = doneListForExport.length; 
+            document.getElementById('rep-missed').innerText = missedListForExport.length; 
+            renderReportTable();
+        };
+
         window.switchReportTab = function(tab) {
             currentReportTab = tab; document.getElementById('btnTabMissed').classList.remove('active'); document.getElementById('btnTabDone').classList.remove('active');
             if(tab === 'missed') { document.getElementById('btnTabMissed').classList.add('active'); document.getElementById('reportTitle').innerText = 'قائمة بأسماء غير المستلمين:'; document.getElementById('reportTitle').style.color = 'var(--danger)'; document.getElementById('thTime').style.display = 'none'; }
             else { document.getElementById('btnTabDone').classList.add('active'); document.getElementById('reportTitle').innerText = 'قائمة بأسماء المستلمين:'; document.getElementById('reportTitle').style.color = 'var(--success)'; document.getElementById('thTime').style.display = 'table-cell'; }
             renderReportTable();
         };
+
         window.renderReportTable = function() {
             const tbody = document.getElementById('reportTableBody'); const activeList = currentReportTab === 'missed' ? missedListForExport : doneListForExport; let tableHtml = "";
             if(activeList.length === 0) tableHtml = `<tr><td colspan="5" style="text-align:center; font-weight:900; padding:40px;">الجدول فارغ</td></tr>`;
             else activeList.forEach(b => { tableHtml += `<tr><td style="font-weight:900;">${b.card_id}</td><td style="font-weight:900; color:var(--primary);">${b.name}</td><td>${b.category || '-'}</td><td dir="ltr">${b.phone || '-'}</td>${currentReportTab === 'done' ? `<td style="font-weight:900; color:var(--success); line-height:1.4;">${b.delivery_date} <br><span style="font-size:16px;">(${b.item_name})</span></td>` : ''}</tr>`; });
             tbody.innerHTML = tableHtml;
         };
+
         window.exportToExcel = function() {
-            const activeList = currentReportTab === 'missed' ? missedListForExport : doneListForExport; if(activeList.length === 0) return alert("لا يوجد بيانات.");
-            const dataToExport = activeList.map(b => ({ "رقم البطاقة": String(b.card_id || ""), "الاسم": String(b.name || ""), "الفئة": String(b.category || ""), "الجوال": String(b.phone || ""), "حالة الاستلام": currentReportTab === 'missed' ? "لم يستلم" : "استلم", "مادة التسليم": currentReportTab === 'done' ? String(b.item_name || "") : "-", "وقت التسليم": currentReportTab === 'done' ? String(b.delivery_date || "") : "-" }));
-            const worksheet = XLSX.utils.json_to_sheet(dataToExport); const workbook = XLSX.utils.book_new(); const sheetName = currentReportTab === 'missed' ? "غير مستلمين" : "مستلمين";
-            XLSX.utils.book_append_sheet(workbook, worksheet, sheetName); XLSX.writeFile(workbook, `تقرير_${sheetName}_${new Date().toISOString().split('T')[0]}.xlsx`);
+            const activeList = currentReportTab === 'missed' ? missedListForExport : doneListForExport; 
+            if(activeList.length === 0) return alert("لا يوجد بيانات للتصدير في هذا الجدول.");
+            
+            const selValue = document.getElementById('reportCampaignSelect');
+            const reportName = selValue.options[selValue.selectedIndex].text;
+
+            const dataToExport = activeList.map(b => ({ 
+                "رقم البطاقة": String(b.card_id || ""), 
+                "الاسم": String(b.name || ""), 
+                "الفئة": String(b.category || ""), 
+                "الجوال": String(b.phone || ""), 
+                "حالة الاستلام": currentReportTab === 'missed' ? "لم يستلم" : "استلم", 
+                "مادة التسليم": currentReportTab === 'done' ? String(b.item_name || "") : "-", 
+                "وقت التسليم": currentReportTab === 'done' ? String(b.delivery_date || "") : "-" 
+            }));
+            
+            const worksheet = XLSX.utils.json_to_sheet(dataToExport); const workbook = XLSX.utils.book_new(); 
+            const sheetName = currentReportTab === 'missed' ? "غير مستلمين" : "مستلمين";
+            
+            XLSX.utils.book_append_sheet(workbook, worksheet, sheetName); 
+            XLSX.writeFile(workbook, `${reportName}_${sheetName}.xlsx`);
         };
 
+        // --- الإحصائيات (لم تتغير لتبقى بنفس الدقة القديمة) ---
         window.loadStats = async function() {
             document.getElementById('tablesContainer').innerHTML = "<div style='text-align:center; padding:40px; font-weight:900;'>جاري تحميل البيانات...</div>";
             try { await fetchAllBeneficiaries(); let stats = { total: 0, orphans: 0, widows: 0, divorced: 0, poor: 0, special: 0 };
