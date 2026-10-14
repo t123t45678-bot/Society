@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>الدر المكنون - نظام إدارة التوزيع الذكي VIP</title>
+    <title>الدر المكنون - نظام إدارة التوزيع الذكي VIP (النسخة المحمية والمطورة)</title>
     <!-- مكتبات خارجية -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://unpkg.com/html5-qrcode"></script>
@@ -15,6 +15,7 @@
         :root { 
             --primary: #0f172a; --secondary: #1e293b; --accent: #2563eb; 
             --success: #10b981; --danger: #ef4444; --warning: #f59e0b; 
+            --whatsapp: #25D366; --whatsapp-dark: #128C7E;
             --bg: #f8fafc; --text-main: #1e293b; --gold: #d4af37;
         }
         @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;800;900&display=swap');
@@ -26,70 +27,78 @@
             font-size: 18px; 
         }
         
-        /* تأثير الزجاج اللطيف */
         .glass-panel {
-            background: rgba(255, 255, 255, 0.85);
+            background: rgba(255, 255, 255, 0.9);
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.05);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.06);
             border-radius: 20px;
         }
 
-        /* --- شاشة تسجيل الدخول --- */
+        /* --- شاشة تسجيل الدخول المحمية --- */
         #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, var(--primary), var(--secondary)); z-index: 9999; display: flex; justify-content: center; align-items: center; }
-        .login-box { background: rgba(255, 255, 255, 0.95); padding: 50px 40px; border-radius: 25px; box-shadow: 0 25px 50px rgba(0,0,0,0.5); text-align: center; width: 90%; max-width: 450px; animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);}
-        .login-box h2 { color: var(--primary); margin-bottom: 35px; font-weight: 900; font-size: 32px;}
-        .login-input { width: 100%; padding: 18px; border: 2px solid #cbd5e1; border-radius: 12px; font-size: 22px; font-weight: 700; margin-bottom: 25px; text-align: center; font-family: 'Tajawal', sans-serif; transition: 0.3s;}
+        .login-box { background: rgba(255, 255, 255, 0.97); padding: 45px 35px; border-radius: 25px; box-shadow: 0 25px 50px rgba(0,0,0,0.5); text-align: center; width: 90%; max-width: 450px; animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1); border: 2px solid var(--gold);}
+        .login-box h2 { color: var(--primary); margin-bottom: 15px; font-weight: 900; font-size: 30px;}
+        .login-input { width: 100%; padding: 18px; border: 2px solid #cbd5e1; border-radius: 12px; font-size: 22px; font-weight: 700; margin-bottom: 20px; text-align: center; font-family: 'Tajawal', sans-serif; transition: 0.3s;}
         .login-input:focus { border-color: var(--gold); outline: none; box-shadow: 0 0 15px rgba(212, 175, 55, 0.3); }
         .login-btn { width: 100%; padding: 18px; background: linear-gradient(135deg, var(--gold), #b8962e); color: var(--primary); border: none; border-radius: 12px; font-size: 22px; font-weight: 900; cursor: pointer; transition: 0.3s; }
         .login-btn:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(212, 175, 55, 0.4); }
-        .login-error { color: var(--danger); margin-top: 15px; display: none; font-weight: 800; font-size: 20px;}
+        .login-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+        .login-error { color: var(--danger); margin-top: 15px; display: none; font-weight: 800; font-size: 18px;}
 
         /* --- الهيكل العام --- */
         #mainApp { display: none; }
         
         .app-header { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; text-align: center; padding: 40px 20px; position: relative; overflow: hidden; border-bottom: 5px solid var(--gold); }
-        .app-title { font-size: 38px; font-weight: 900; margin: 0; position: relative; z-index: 1; letter-spacing: 1px;}
+        .app-title { font-size: 36px; font-weight: 900; margin: 0; position: relative; z-index: 1; letter-spacing: 0.5px;}
         .programmer-tag { position: absolute; top: 15px; right: 15px; font-size: 14px; font-weight: 700; background: rgba(255,255,255,0.1); padding: 8px 20px; border-radius: 20px; border: 1px solid var(--gold); color: var(--gold); backdrop-filter: blur(5px);}
         .user-badge { position: absolute; top: 15px; left: 15px; font-size: 16px; background: var(--accent); padding: 8px 20px; border-radius: 20px; font-weight: 800; }
 
-        .navbar { display: flex; background: rgba(255,255,255,0.9); backdrop-filter: blur(10px); padding: 15px 20px; justify-content: center; gap: 15px; flex-wrap: wrap; box-shadow: 0 10px 30px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; border-bottom: 1px solid #e2e8f0;}
-        .nav-btn { background: transparent; border: 2px solid transparent; color: var(--text-main); font-size: 18px; font-weight: 800; cursor: pointer; padding: 12px 25px; border-radius: 15px; transition: 0.3s; display: flex; align-items: center; gap: 10px;}
+        .navbar { display: flex; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); padding: 15px 20px; justify-content: center; gap: 12px; flex-wrap: wrap; box-shadow: 0 10px 30px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; border-bottom: 1px solid #e2e8f0;}
+        .nav-btn { background: transparent; border: 2px solid transparent; color: var(--text-main); font-size: 18px; font-weight: 800; cursor: pointer; padding: 12px 22px; border-radius: 15px; transition: 0.3s; display: flex; align-items: center; gap: 10px;}
         .nav-btn:hover { background: #f1f5f9; transform: translateY(-2px);}
         .nav-btn.active { background: var(--accent); color: white; box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3); }
         .admin-only { display: none; }
 
-        .container { max-width: 1250px; margin: 40px auto; padding: 0 20px; }
-        .page-section { display: none; padding: 40px; animation: fadeIn 0.5s ease; }
+        .container { max-width: 1280px; margin: 35px auto; padding: 0 20px; }
+        .page-section { display: none; padding: 35px; animation: fadeIn 0.4s ease; }
         .page-section.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.99); } to { opacity: 1; transform: scale(1); } }
         @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
 
         /* --- الأزرار والحقول --- */
-        .btn { padding: 14px 28px; border: none; border-radius: 12px; cursor: pointer; font-size: 18px; font-weight: 800; color: white; transition: 0.3s; display: inline-flex; align-items: center; justify-content: center; gap: 10px;}
+        .btn { padding: 13px 24px; border: none; border-radius: 12px; cursor: pointer; font-size: 18px; font-weight: 800; color: white; transition: 0.3s; display: inline-flex; align-items: center; justify-content: center; gap: 10px; font-family: 'Tajawal', sans-serif;}
         .btn-primary { background: linear-gradient(135deg, var(--accent), #1d4ed8); }
         .btn-success { background: linear-gradient(135deg, var(--success), #059669); }
+        .btn-whatsapp { background: linear-gradient(135deg, var(--whatsapp), var(--whatsapp-dark)); }
         .btn-danger { background: linear-gradient(135deg, var(--danger), #b91c1c); }
         .btn-warning { background: linear-gradient(135deg, var(--warning), #d97706); color: white;}
-        .btn:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.15); }
+        .btn-secondary { background: linear-gradient(135deg, #475569, #334155); color: white;}
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 18px rgba(0,0,0,0.15); }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
         
-        input, select { padding: 16px 20px; border: 2px solid #cbd5e1; border-radius: 12px; font-size: 20px; width: 100%; box-sizing: border-box; margin-bottom: 20px; transition: 0.3s; font-family: 'Tajawal', sans-serif; font-weight: 800; background: #fff;}
-        input:focus, select:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15); }
+        input, select, textarea { padding: 15px 18px; border: 2px solid #cbd5e1; border-radius: 12px; font-size: 19px; width: 100%; box-sizing: border-box; margin-bottom: 18px; transition: 0.3s; font-family: 'Tajawal', sans-serif; font-weight: 800; background: #fff;}
+        input:focus, select:focus, textarea:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15); }
 
         /* --- الجداول والتبويبات --- */
         .table-container { overflow-x: auto; border-radius: 15px; border: 2px solid #e2e8f0; max-height: 550px; overflow-y: auto; background: white;}
         table { width: 100%; border-collapse: collapse; background: white; }
-        th, td { padding: 18px 15px; text-align: right; border-bottom: 1px solid #e2e8f0; font-size: 18px;}
-        th { background-color: var(--primary); color: white; font-weight: 900; font-size: 20px; position: sticky; top: 0; z-index: 10;}
+        th, td { padding: 16px 14px; text-align: right; border-bottom: 1px solid #e2e8f0; font-size: 18px;}
+        th { background-color: var(--primary); color: white; font-weight: 900; font-size: 19px; position: sticky; top: 0; z-index: 10;}
         tr:hover { background-color: #f8fafc; }
 
-        .tab-buttons { display: flex; gap: 15px; margin-bottom: 25px; overflow-x: auto; padding-bottom: 10px; }
-        .tab-btn { flex: 1; min-width: 120px; padding: 15px; background: white; border: 2px solid #cbd5e1; border-radius: 12px; cursor: pointer; font-weight: 800; font-size: 20px; color: #475569; transition: 0.3s; }
+        .tab-buttons { display: flex; gap: 12px; margin-bottom: 25px; overflow-x: auto; padding-bottom: 8px; }
+        .tab-btn { flex: 1; min-width: 120px; padding: 14px; background: white; border: 2px solid #cbd5e1; border-radius: 12px; cursor: pointer; font-weight: 800; font-size: 19px; color: #475569; transition: 0.3s; font-family: 'Tajawal', sans-serif;}
         .tab-btn.active { background: var(--accent); border-color: var(--accent); color: white; box-shadow: 0 8px 15px rgba(37, 99, 235, 0.25);}
         
-        .campaign-badge { display: inline-block; background: var(--accent); color: white; padding: 5px 15px; border-radius: 20px; font-size: 16px; font-weight: bold; margin-bottom: 10px; }
+        .campaign-badge { display: inline-block; background: var(--accent); color: white; padding: 5px 15px; border-radius: 20px; font-size: 15px; font-weight: bold; margin-bottom: 8px; }
         .campaign-closed-msg { display: none; text-align: center; padding: 50px 20px; background: #fef2f2; border: 3px dashed var(--danger); border-radius: 20px; color: var(--danger); font-size: 26px; font-weight: 900; }
-        .sms-checkbox { width: 25px; height: 25px; cursor: pointer; accent-color: var(--accent); }
+        .sms-checkbox, .select-all-checkbox { width: 24px; height: 24px; cursor: pointer; accent-color: var(--accent); margin: 0; }
+        .tag-chip { background: #e2e8f0; color: var(--primary); border: 1px solid #cbd5e1; padding: 6px 14px; border-radius: 20px; font-size: 15px; font-weight: 800; cursor: pointer; display: inline-block; margin-left: 8px; margin-bottom: 8px; transition: 0.2s;}
+        .tag-chip:hover { background: var(--accent); color: white; border-color: var(--accent); }
+        .bot-status-pill { display: inline-flex; align-items: center; gap: 8px; padding: 8px 18px; border-radius: 25px; font-size: 16px; font-weight: 900; }
+        .bot-online { background: #dcfce7; color: #166534; border: 2px solid #22c55e; }
+        .bot-offline { background: #fee2e2; color: #991b1b; border: 2px solid #ef4444; }
     </style>
 </head>
 <body>
@@ -97,13 +106,14 @@
     <audio id="audioSuccess" src="https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3"></audio>
     <audio id="audioError" src="https://assets.mixkit.co/active_storage/sfx/2954/2954-preview.mp3"></audio>
 
-    <!-- شاشة تسجيل الدخول -->
+    <!-- شاشة تسجيل الدخول المحمية -->
     <div id="loginOverlay">
         <div class="login-box">
-            <i class="fas fa-gem" style="font-size: 60px; color: var(--gold); margin-bottom: 20px;"></i>
-            <h2>بوابة الدر المكنون</h2>
+            <i class="fas fa-shield-alt" style="font-size: 58px; color: var(--gold); margin-bottom: 15px;"></i>
+            <h2>بوابة الدر المكنون VIP</h2>
+            <p style="color:#64748b; font-size:15px; font-weight:700; margin-top:0; margin-bottom:25px;">نظام محمي بتشفير SHA-256</p>
             <input type="password" id="loginPassword" class="login-input" placeholder="أدخل كلمة المرور..." onkeypress="handleLoginPress(event)">
-            <button class="login-btn" onclick="checkLogin()">دخول النظام</button>
+            <button id="loginBtn" class="login-btn" onclick="checkLogin()">دخول النظام <i class="fas fa-lock-open"></i></button>
             <div id="loginError" class="login-error">❌ كلمة المرور غير صحيحة</div>
         </div>
     </div>
@@ -111,28 +121,29 @@
     <!-- التطبيق الرئيسي -->
     <div id="mainApp">
         <header class="app-header">
-            <div class="programmer-tag">الدر المكنون</div>
+            <div class="programmer-tag"><i class="fas fa-gem"></i> الدر المكنون VIP</div>
             <div id="userBadge" class="user-badge"></div>
-            <h1 class="app-title">نظام التوزيع الذكي VIP</h1>
-            <button onclick="logout()" style="position: absolute; bottom: 15px; left: 15px; background: rgba(255,255,255,0.2); color:white; border:1px solid rgba(255,255,255,0.5); padding:8px 15px; border-radius:8px; cursor:pointer; font-weight:800; backdrop-filter: blur(5px);"><i class="fas fa-sign-out-alt"></i> خروج</button>
+            <h1 class="app-title">نظام إدارة التوزيع الذكي والواتساب</h1>
+            <button onclick="logout()" style="position: absolute; bottom: 15px; left: 15px; background: rgba(255,255,255,0.2); color:white; border:1px solid rgba(255,255,255,0.5); padding:8px 15px; border-radius:8px; cursor:pointer; font-weight:800; backdrop-filter: blur(5px); font-family:'Tajawal',sans-serif;"><i class="fas fa-sign-out-alt"></i> خروج آمن</button>
         </header>
 
         <div class="navbar">
             <button class="nav-btn active" onclick="switchPage('scannerPage', this)"><i class="fas fa-qrcode"></i> شاشة التوزيع</button>
-            <button class="nav-btn admin-only" onclick="switchPage('smsPage', this); loadSmsData();"><i class="fas fa-sms"></i> بوابة الرسائل (SMS)</button>
+            <button class="nav-btn admin-only" onclick="switchPage('smsPage', this); loadSmsData();"><i class="fab fa-whatsapp" style="font-size:22px; color:#25D366;"></i> بوابة الواتساب</button>
             <button class="nav-btn admin-only" onclick="switchPage('archivePage', this); loadArchiveCategory('ايتام', document.getElementById('tab-arch-1'));"><i class="fas fa-folder-open"></i> الأرشيف</button>
-            <button class="nav-btn admin-only" onclick="switchPage('reportsPage', this); setupReportsFilters();"><i class="fas fa-list-alt"></i> التقارير</button>
+            <button class="nav-btn admin-only" onclick="switchPage('reportsPage', this); setupReportsFilters();"><i class="fas fa-list-alt"></i> التقارير والأرشفة</button>
             <button class="nav-btn admin-only" onclick="switchPage('dashboardPage', this); loadStats();"><i class="fas fa-chart-pie"></i> الإحصائيات</button>
-            <button class="nav-btn admin-only" onclick="switchPage('settingsPage', this)"><i class="fas fa-cog"></i> الإعدادات</button>
+            <button class="nav-btn admin-only" onclick="switchPage('settingsPage', this)"><i class="fas fa-cog"></i> الإعدادات والحماية</button>
         </div>
 
         <div class="container">
             
             <!-- ================= 1. شاشة التوزيع ================= -->
             <div id="scannerPage" class="page-section glass-panel active">
-                <div class="admin-only" style="background: linear-gradient(135deg, var(--primary), var(--secondary)); padding: 35px; border-radius: 20px; margin-bottom: 35px; text-align: center; border: 3px solid var(--gold); box-shadow: 0 15px 35px rgba(0,0,0,0.2);">
-                    <h3 style="margin-top:0; font-size: 28px; color: var(--gold); font-weight: 900;"><i class="fas fa-bullhorn"></i> إطلاق حملة توزيع مركزية</h3>
-                    <div style="display: flex; gap: 20px; flex-wrap: wrap; margin-top: 25px;">
+                <div class="admin-only" style="background: linear-gradient(135deg, var(--primary), var(--secondary)); padding: 30px; border-radius: 20px; margin-bottom: 35px; text-align: center; border: 3px solid var(--gold); box-shadow: 0 15px 35px rgba(0,0,0,0.2);">
+                    <h3 style="margin-top:0; font-size: 26px; color: var(--gold); font-weight: 900;"><i class="fas fa-bullhorn"></i> إطلاق حملة توزيع مركزية (حفظ آخر 3 حملات تلقائياً)</h3>
+                    <p style="color:#cbd5e1; font-size:16px; margin-top:-10px; margin-bottom:20px;">ملاحظة: عند إطلاق حملة جديدة وتجاوز عدد الحملات المحفوظة 3 حملات، سيقوم النظام تلقائياً بتنزيل ملف إكسل أرشيفي كامل للحملة الأقدم قبل مسحها من القاعدة.</p>
+                    <div style="display: flex; gap: 20px; flex-wrap: wrap; margin-top: 15px;">
                         <div style="flex: 1; min-width: 250px; text-align: right;">
                             <label style="color: white; font-weight: 800; margin-bottom: 10px; display: block;">1. الفئة المستهدفة في الحملة:</label>
                             <select id="adminCampaignCategory" style="border-color: var(--gold);">
@@ -149,9 +160,9 @@
                             <input type="text" id="adminCampaignItems" placeholder="مثال: لحمة, سلة غذائية, مال" style="border-color: var(--gold);">
                         </div>
                     </div>
-                    <div style="margin-top: 15px;">
-                        <button class="btn btn-success" style="font-size: 22px; padding: 15px 40px; margin: 10px;" onclick="launchCampaign()"><i class="fas fa-rocket"></i> إطلاق وفتح التوزيع</button>
-                        <button class="btn btn-danger" style="font-size: 22px; padding: 15px 40px; margin: 10px;" onclick="stopCampaign()"><i class="fas fa-lock"></i> إغلاق التوزيع كلياً</button>
+                    <div style="margin-top: 10px;">
+                        <button id="btnLaunchCamp" class="btn btn-success" style="font-size: 21px; padding: 15px 35px; margin: 8px;" onclick="launchCampaign()"><i class="fas fa-rocket"></i> إطلاق وفتح التوزيع</button>
+                        <button class="btn btn-danger" style="font-size: 21px; padding: 15px 35px; margin: 8px;" onclick="stopCampaign()"><i class="fas fa-lock"></i> إغلاق التوزيع كلياً</button>
                     </div>
                 </div>
 
@@ -162,34 +173,82 @@
                 </div>
 
                 <div id="volunteerActiveSection" style="display: none;">
-                    <div style="background: #f8fafc; padding: 35px; border-radius: 25px; border: 2px dashed #cbd5e1; text-align: center;">
+                    <div style="background: #f8fafc; padding: 30px; border-radius: 25px; border: 2px dashed #cbd5e1; text-align: center;">
                         <div style="background: white; padding: 25px; border-radius: 20px; margin-bottom: 25px; box-shadow: 0 8px 15px rgba(0,0,0,0.05); text-align: right;">
-                            <div class="campaign-badge">الحملة نشطة الآن - رقم <span id="volActiveCampId"></span></div>
-                            <h4 style="margin-top: 0; color: var(--primary); font-size: 26px; font-weight: 900;">إعدادات التوزيع المفروضة من الإدارة:</h4>
-                            <p style="font-size: 22px; font-weight: 800; color: var(--success); border-bottom: 1px solid #e2e8f0; padding-bottom: 15px;">
+                            <div class="campaign-badge">الحملة نشطة الآن - توزيع رقم <span id="volActiveCampId"></span></div>
+                            <h4 style="margin-top: 0; color: var(--primary); font-size: 24px; font-weight: 900;">إعدادات التوزيع المفروضة من الإدارة:</h4>
+                            <p style="font-size: 21px; font-weight: 800; color: var(--success); border-bottom: 1px solid #e2e8f0; padding-bottom: 15px;">
                                 <i class="fas fa-users"></i> الفئة المسموحة: <span id="volActiveCatDisplay" style="color:var(--primary);">جاري التحميل...</span>
                             </p>
-                            <label style="font-weight: 900; font-size: 22px; display: block; margin-bottom: 10px; color:var(--danger); margin-top: 20px;">اختر المادة المراد تسليمها الآن:</label>
-                            <select id="volItemSelect" style="border-color: var(--danger); background:#fff5f5; font-size: 24px; font-weight: 900; color: var(--danger);"></select>
+                            <label style="font-weight: 900; font-size: 21px; display: block; margin-bottom: 10px; color:var(--danger); margin-top: 20px;">اختر المادة المراد تسليمها الآن:</label>
+                            <select id="volItemSelect" style="border-color: var(--danger); background:#fff5f5; font-size: 23px; font-weight: 900; color: var(--danger);"></select>
                         </div>
-                        <button class="btn btn-primary" style="font-size: 26px; font-weight: 900; padding: 25px 40px; width: 100%; box-shadow: 0 10px 25px rgba(37,99,235,0.4);" onclick="window.startScanner()"><i class="fas fa-camera"></i> تشغيل الكاميرا ومسح البطاقة</button>
+                        <button class="btn btn-primary" style="font-size: 24px; font-weight: 900; padding: 22px 35px; width: 100%; box-shadow: 0 10px 25px rgba(37,99,235,0.4);" onclick="window.startScanner()"><i class="fas fa-camera"></i> تشغيل الكاميرا ومسح البطاقة</button>
                     </div>
                     <div id="reader" style="display: none; width: 100%; max-width: 500px; margin: 30px auto; border-radius: 25px; overflow: hidden; border: 5px solid white; box-shadow: 0 15px 40px rgba(0,0,0,0.25);"></div>
-                    <div id="loadingScanner" style="display: none; text-align: center; margin: 30px; font-weight: 900; font-size: 26px; color: var(--accent);">جاري مطابقة البيانات...</div>
-                    <div id="resultBox" style="padding: 40px 20px; border-radius: 20px; font-size: 28px; font-weight: 900; color: white; text-align: center; margin-top: 30px; display: none; box-shadow: 0 15px 30px rgba(0,0,0,0.2);">
+                    <div id="loadingScanner" style="display: none; text-align: center; margin: 30px; font-weight: 900; font-size: 25px; color: var(--accent);">جاري مطابقة البيانات...</div>
+                    <div id="resultBox" style="padding: 35px 20px; border-radius: 20px; font-size: 26px; font-weight: 900; color: white; text-align: center; margin-top: 30px; display: none; box-shadow: 0 15px 30px rgba(0,0,0,0.2);">
                         <div id="resultText" style="line-height: 1.5;"></div>
-                        <button class="btn" style="background: rgba(255,255,255,0.9); color: var(--primary); margin-top: 25px; width: 100%; font-size: 24px; font-weight: 900;" onclick="window.resetScanner()">مسح بطاقة تالية <i class="fas fa-redo"></i></button>
+                        <button class="btn" style="background: rgba(255,255,255,0.95); color: var(--primary); margin-top: 25px; width: 100%; font-size: 23px; font-weight: 900;" onclick="window.resetScanner()">مسح بطاقة تالية <i class="fas fa-redo"></i></button>
                     </div>
                 </div>
             </div>
 
-            <!-- ================= 2. بوابة الـ SMS ================= -->
+            <!-- ================= 2. بوابة الواتساب (بدلاً من SMS التقليدي) ================= -->
             <div id="smsPage" class="page-section glass-panel">
-                <h2 style="color: var(--primary); font-size: 32px; font-weight: 900; margin-bottom: 30px;">بوابة الإرسال المركزي للرسائل النصية (SMS)</h2>
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:15px; margin-bottom:25px;">
+                    <h2 style="color: var(--primary); font-size: 30px; font-weight: 900; margin: 0;"><i class="fab fa-whatsapp" style="color:var(--whatsapp);"></i> بوابة الإرسال المركزي عبر بوت الواتساب</h2>
+                    <div id="whatsappBotStatusBadge" class="bot-status-pill bot-offline">
+                        <i class="fas fa-circle"></i> حالة البوت: غير متصل (شغّل bot.js)
+                    </div>
+                </div>
+
+                <!-- إعداد نص الرسالة ومفتاح الدولة -->
+                <div style="background: #f0fdf4; padding: 25px; border-radius: 20px; margin-bottom: 25px; border: 2px solid #86efac;">
+                    <div style="display:flex; gap:20px; flex-wrap:wrap; margin-bottom:15px;">
+                        <div style="flex: 2; min-width: 280px;">
+                            <label style="font-weight: 900; color: #166534; display: block; margin-bottom: 8px;"><i class="fas fa-edit"></i> نص رسالة الواتساب المراد إرسالها (إرسال فقط بدون رد):</label>
+                            <div style="margin-bottom: 10px;">
+                                <span style="font-size:15px; font-weight:800; color:#475569;">إدراج متغير ذكي: </span>
+                                <span class="tag-chip" onclick="insertTemplateTag('{الاسم}')">+ {الاسم}</span>
+                                <span class="tag-chip" onclick="insertTemplateTag('{رقم_البطاقة}')">+ {رقم_البطاقة}</span>
+                                <span class="tag-chip" onclick="insertTemplateTag('{الفئة}')">+ {الفئة}</span>
+                                <span class="tag-chip" onclick="insertTemplateTag('{الحملة}')">+ {الحملة}</span>
+                            </div>
+                            <textarea id="whatsappMessageTemplate" rows="3" style="margin-bottom:0; font-size:18px; border-color:#86efac;">السلام عليكم {الاسم}، نود إعلامكم ببدء توزيع ({الحملة}) في جمعية الدر المكنون. يرجى إحضار البطاقة رقم ({رقم_البطاقة}) عند الحضور للاستلام.</textarea>
+                        </div>
+                        <div style="flex: 1; min-width: 240px;">
+                            <label style="font-weight: 900; color: #166534; display: block; margin-bottom: 8px;"><i class="fas fa-globe"></i> مفتاح الدولة للأرقام المحلية:</label>
+                            <select id="whatsappCountryCode" onchange="saveWhatsappSettings()" style="border-color:#86efac; margin-bottom:12px;">
+                                <option value="963">سوريا (+963)</option>
+                                <option value="962">الأردن (+962)</option>
+                                <option value="970">فلسطين (+970)</option>
+                                <option value="966">السعودية (+966)</option>
+                                <option value="961">لبنان (+961)</option>
+                                <option value="90">تركيا (+90)</option>
+                                <option value="964">العراق (+964)</option>
+                                <option value="20">مصر (+20)</option>
+                                <option value="971">الإمارات (+971)</option>
+                                <option value="965">الكويت (+965)</option>
+                                <option value="31">هولندا (+31)</option>
+                            </select>
+                            <button class="btn btn-secondary" style="width:100%; font-size:16px; padding:12px;" onclick="resetAllSmsStatuses()">
+                                <i class="fas fa-broom"></i> تصفير حالات الإرسال السابقة
+                            </button>
+                        </div>
+                    </div>
+                    <!-- ملخص عدادات الواتساب -->
+                    <div style="display:flex; gap:15px; flex-wrap:wrap; padding-top:12px; border-top:1px solid #bbf7d0; font-weight:800; font-size:17px;">
+                        <span style="color:#475569;">إجمالي المعروض: <strong id="waCountTotal">0</strong></span> |
+                        <span style="color:#d97706;">قيد الإرسال بالبوت ⏳: <strong id="waCountPending">0</strong></span> |
+                        <span style="color:#059669;">تم الإرسال ✔️: <strong id="waCountSent">0</strong></span> |
+                        <span style="color:#dc2626;">فشل / بدون رقم ❌: <strong id="waCountFailed">0</strong></span>
+                    </div>
+                </div>
                 
-                <div style="background: white; padding: 25px; border-radius: 20px; margin-bottom: 30px; display: flex; gap: 20px; flex-wrap: wrap; border: 2px solid #e2e8f0; align-items: flex-end;">
-                    <div style="flex: 1; min-width: 200px;">
-                        <label style="font-weight: 900; margin-bottom: 10px; display: block;">الفلترة حسب الفئة:</label>
+                <div style="background: white; padding: 22px; border-radius: 20px; margin-bottom: 25px; display: flex; gap: 18px; flex-wrap: wrap; border: 2px solid #e2e8f0; align-items: flex-end;">
+                    <div style="flex: 1; min-width: 180px;">
+                        <label style="font-weight: 900; margin-bottom: 8px; display: block;">الفلترة حسب الفئة:</label>
                         <select id="smsCategoryFilter" onchange="filterSmsTable()" style="margin-bottom: 0;">
                             <option value="الكل">جميع المستفيدين</option>
                             <option value="ايتام">أيتام</option>
@@ -199,16 +258,16 @@
                             <option value="إعاقة">إعاقة</option>
                         </select>
                     </div>
-                    <div style="flex: 1; min-width: 200px;">
-                        <label style="font-weight: 900; margin-bottom: 10px; display: block;">بحث مخصص:</label>
+                    <div style="flex: 1; min-width: 180px;">
+                        <label style="font-weight: 900; margin-bottom: 8px; display: block;">بحث مخصص:</label>
                         <input type="text" id="smsSearchInput" placeholder="بحث بالاسم أو الرقم..." onkeyup="filterSmsTable()" style="margin-bottom: 0;">
                     </div>
-                    <div style="flex: 2; min-width: 300px; display: flex; gap: 10px;">
-                        <button class="btn btn-primary" style="flex: 1; font-size: 20px;" onclick="sendSmsToSelected()">
-                            <i class="fas fa-paper-plane"></i> إرسال للمحددين
+                    <div style="flex: 2; min-width: 280px; display: flex; gap: 10px; flex-wrap: wrap;">
+                        <button class="btn btn-whatsapp" style="flex: 1; font-size: 19px;" onclick="sendSmsToSelected()">
+                            <i class="fab fa-whatsapp"></i> إرسال للمحددين
                         </button>
-                        <button class="btn btn-warning" style="flex: 1; font-size: 20px;" onclick="sendSmsToAllFiltered()">
-                            <i class="fas fa-share-all"></i> إرسال للقائمة كاملة
+                        <button class="btn btn-warning" style="flex: 1; font-size: 19px;" onclick="sendSmsToAllFiltered()">
+                            <i class="fas fa-paper-plane"></i> إرسال للقائمة المفلترة
                         </button>
                     </div>
                 </div>
@@ -217,17 +276,17 @@
                     <table id="smsTable">
                         <thead>
                             <tr>
-                                <th style="width: 50px; text-align: center;"><input type="checkbox" id="selectAllSms" class="sms-checkbox" onchange="toggleSelectAllSms()"></th>
+                                <th style="width: 50px; text-align: center;"><input type="checkbox" id="selectAllSms" class="select-all-checkbox" onchange="toggleSelectAllSms()"></th>
                                 <th>رقم البطاقة</th>
                                 <th>الاسم الكامل</th>
                                 <th>الفئة</th>
                                 <th>الجوال</th>
-                                <th>حالة الرسالة</th>
+                                <th>حالة الواتساب</th>
                                 <th>إجراء فردي</th>
                             </tr>
                         </thead>
                         <tbody id="smsTableBody">
-                            <tr><td colspan="7" style="text-align:center; padding: 40px; font-weight: 900;">جاري تحميل البيانات الحية...</td></tr>
+                            <tr><td colspan="7" style="text-align:center; padding: 40px; font-weight: 900;">جاري تحميل البيانات...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -235,7 +294,7 @@
 
             <!-- ================= 3. الأرشيف ================= -->
             <div id="archivePage" class="page-section glass-panel">
-                <h2 style="color: var(--primary); font-size: 32px; font-weight: 900; margin-bottom: 30px;">الأرشيف الشامل للمستفيدين</h2>
+                <h2 style="color: var(--primary); font-size: 30px; font-weight: 900; margin-bottom: 25px;">الأرشيف الشامل للمستفيدين (آخر 3 حملات محفوظة)</h2>
                 <div class="tab-buttons">
                     <button id="tab-arch-1" class="tab-btn active" onclick="loadArchiveCategory('ايتام', this)">الأيتام</button>
                     <button id="tab-arch-2" class="tab-btn" onclick="loadArchiveCategory('ارملة', this)">الأرامل</button>
@@ -243,34 +302,42 @@
                     <button id="tab-arch-4" class="tab-btn" onclick="loadArchiveCategory('فقير', this)">الفقراء</button>
                     <button id="tab-arch-5" class="tab-btn" onclick="loadArchiveCategory('إعاقة', this)">الإعاقة</button>
                 </div>
-                <div class="archive-layout" style="display: flex; gap: 30px; margin-top: 20px; flex-wrap: wrap;">
-                    <div class="archive-sidebar" style="flex: 1; min-width: 300px; background: white; padding: 20px; border-radius: 20px; border: 2px solid #e2e8f0; height: 500px; overflow-y: auto;">
-                        <div class="search-bar"><input type="text" id="archiveSearchInput" placeholder="ابحث بالاسم..." onkeyup="filterArchiveNames()"></div>
-                        <div id="archiveNamesList" style="text-align: center; font-weight: 900; font-size: 20px; color: #64748b;">جاري التحميل...</div>
+                <div class="archive-layout" style="display: flex; gap: 25px; margin-top: 20px; flex-wrap: wrap;">
+                    <div class="archive-sidebar" style="flex: 1; min-width: 280px; background: white; padding: 20px; border-radius: 20px; border: 2px solid #e2e8f0; height: 500px; overflow-y: auto;">
+                        <div class="search-bar"><input type="text" id="archiveSearchInput" placeholder="ابحث بالاسم أو البطاقة..." onkeyup="filterArchiveNames()"></div>
+                        <div id="archiveNamesList" style="text-align: center; font-weight: 900; font-size: 19px; color: #64748b;">جاري التحميل...</div>
                     </div>
                     <div class="archive-content" style="flex: 2; min-width: 300px; background: white; padding: 30px; border-radius: 20px; border: 2px solid #e2e8f0; height: 500px; overflow-y: auto;">
-                        <div id="archiveDetailsContent" style="text-align: center; color: #64748b; font-weight: 900; font-size: 22px; margin-top: 80px;">اختر اسماً من القائمة لعرض السجل.</div>
+                        <div id="archiveDetailsContent" style="text-align: center; color: #64748b; font-weight: 900; font-size: 21px; margin-top: 80px;">اختر اسماً من القائمة لعرض السجل.</div>
                     </div>
                 </div>
             </div>
 
-            <!-- ================= 4. التقارير المعدلة ================= -->
+            <!-- ================= 4. التقارير والأرشفة ================= -->
             <div id="reportsPage" class="page-section glass-panel">
-                <h2 style="color: var(--primary); font-size: 32px; font-weight: 900; margin-bottom: 30px;">تقارير الحملات والتوزيعات</h2>
-                <div style="background: white; padding: 25px; border-radius: 20px; margin-bottom: 30px; border: 2px solid #e2e8f0;">
-                    <label style="font-weight: 900; font-size: 22px; margin-bottom: 15px; display: block; color: var(--primary);">اختر التوزيع لإنشاء التقرير:</label>
-                    <select id="reportCampaignSelect" onchange="generateReportData()" style="border-color: var(--accent); font-size: 20px; background: #f8fafc;">
-                        <option value="">جاري جلب التوزيعات السابقة...</option>
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:15px; margin-bottom:25px;">
+                    <h2 style="color: var(--primary); font-size: 30px; font-weight: 900; margin: 0;">تقارير الحملات والتصدير الأرشيفي</h2>
+                    <button class="btn btn-warning" onclick="checkAndCleanOldCampaigns(false)"><i class="fas fa-file-archive"></i> فحص وتنزيل أرشيف الحملات الأقدم من 3</button>
+                </div>
+
+                <div style="background: white; padding: 25px; border-radius: 20px; margin-bottom: 25px; border: 2px solid #e2e8f0;">
+                    <label style="font-weight: 900; font-size: 20px; margin-bottom: 12px; display: block; color: var(--primary);">اختر التوزيع والمادة لإنشاء التقرير:</label>
+                    <select id="reportCampaignSelect" onchange="generateReportData()" style="border-color: var(--accent); font-size: 20px; background: #f8fafc; margin-bottom: 10px;">
+                        <option value="">جاري جلب التوزيعات المحفوظة...</option>
                     </select>
+                    <div id="reportCampaignMetaInfo" style="font-size:16px; color:#475569; font-weight:800;"></div>
                 </div>
                 
-                <div class="tab-buttons" style="margin-bottom: 30px;">
-                    <button id="btnTabMissed" class="tab-btn active" style="font-size: 22px;" onclick="switchReportTab('missed')">غير المستلمين لهذه المادة (<span id="rep-missed">0</span>)</button>
-                    <button id="btnTabDone" class="tab-btn" style="font-size: 22px;" onclick="switchReportTab('done')">المستلمين لهذه المادة (<span id="rep-done">0</span>)</button>
+                <div class="tab-buttons" style="margin-bottom: 25px;">
+                    <button id="btnTabMissed" class="tab-btn active" style="font-size: 20px;" onclick="switchReportTab('missed')">غير المستلمين لهذه المادة (<span id="rep-missed">0</span>)</button>
+                    <button id="btnTabDone" class="tab-btn" style="font-size: 20px;" onclick="switchReportTab('done')">المستلمين لهذه المادة (<span id="rep-done">0</span>)</button>
                 </div>
-                <div style="display: flex; justify-content: space-between; margin-bottom: 20px; align-items: center; flex-wrap: wrap;">
-                    <h3 id="reportTitle" style="color: var(--danger); margin: 0; font-size: 28px; font-weight: 900;">قائمة بأسماء غير المستلمين:</h3>
-                    <button class="btn btn-success" onclick="exportToExcel()">تصدير لملف Excel <i class="fas fa-file-excel"></i></button>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 20px; align-items: center; flex-wrap: wrap; gap: 10px;">
+                    <h3 id="reportTitle" style="color: var(--danger); margin: 0; font-size: 25px; font-weight: 900;">قائمة بأسماء غير المستلمين:</h3>
+                    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                        <button class="btn btn-success" onclick="exportToExcel()"><i class="fas fa-file-excel"></i> تصدير الجدول الحالي لـ Excel</button>
+                        <button class="btn btn-primary" onclick="exportFullCampaignArchiveById()"><i class="fas fa-download"></i> تنزيل الأرشيف الكامل للحملة المحددة</button>
+                    </div>
                 </div>
                 <div class="table-container">
                     <table id="reportTable">
@@ -282,22 +349,22 @@
 
             <!-- ================= 5. الإحصائيات ================= -->
             <div id="dashboardPage" class="page-section glass-panel">
-                <h2 style="color: var(--primary); font-size: 32px; font-weight: 900; margin-bottom: 30px;">لوحة البيانات والإحصاء</h2>
-                <div class="dashboard-layout" style="display: flex; gap: 30px; flex-wrap: wrap;">
+                <h2 style="color: var(--primary); font-size: 30px; font-weight: 900; margin-bottom: 25px;">لوحة البيانات والإحصاء</h2>
+                <div class="dashboard-layout" style="display: flex; gap: 25px; flex-wrap: wrap;">
                     <div style="flex: 1; min-width: 300px;">
                         <div class="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px;">
-                            <div class="stat-card" style="background:white; padding:20px; border-radius:15px; text-align:center; box-shadow:0 5px 15px rgba(0,0,0,0.05); border: 2px solid #e2e8f0;"><div class="stat-number" id="stat-total" style="font-size:36px; font-weight:900;">0</div><div class="stat-label" style="color:#64748b; font-weight:800;">الإجمالي</div></div>
-                            <div class="stat-card" style="background:white; padding:20px; border-radius:15px; text-align:center; box-shadow:0 5px 15px rgba(0,0,0,0.05); border: 2px solid #e2e8f0;"><div class="stat-number" id="stat-orphans" style="font-size:36px; font-weight:900; color:#db2777;">0</div><div class="stat-label" style="color:#64748b; font-weight:800;">أيتام</div></div>
-                            <div class="stat-card" style="background:white; padding:20px; border-radius:15px; text-align:center; box-shadow:0 5px 15px rgba(0,0,0,0.05); border: 2px solid #e2e8f0;"><div class="stat-number" id="stat-widows" style="font-size:36px; font-weight:900; color:#7c3aed;">0</div><div class="stat-label" style="color:#64748b; font-weight:800;">أرامل</div></div>
-                            <div class="stat-card" style="background:white; padding:20px; border-radius:15px; text-align:center; box-shadow:0 5px 15px rgba(0,0,0,0.05); border: 2px solid #e2e8f0;"><div class="stat-number" id="stat-divorced" style="font-size:36px; font-weight:900; color:#ea580c;">0</div><div class="stat-label" style="color:#64748b; font-weight:800;">مطلقات</div></div>
-                            <div class="stat-card" style="background:white; padding:20px; border-radius:15px; text-align:center; box-shadow:0 5px 15px rgba(0,0,0,0.05); border: 2px solid #e2e8f0;"><div class="stat-number" id="stat-poor" style="font-size:36px; font-weight:900; color:#059669;">0</div><div class="stat-label" style="color:#64748b; font-weight:800;">فقير</div></div>
-                            <div class="stat-card" style="background:white; padding:20px; border-radius:15px; text-align:center; box-shadow:0 5px 15px rgba(0,0,0,0.05); border: 2px solid #e2e8f0;"><div class="stat-number" id="stat-special" style="font-size:36px; font-weight:900; color:#2563eb;">0</div><div class="stat-label" style="color:#64748b; font-weight:800;">إعاقة</div></div>
+                            <div class="stat-card" style="background:white; padding:20px; border-radius:15px; text-align:center; box-shadow:0 5px 15px rgba(0,0,0,0.05); border: 2px solid #e2e8f0;"><div class="stat-number" id="stat-total" style="font-size:34px; font-weight:900;">0</div><div class="stat-label" style="color:#64748b; font-weight:800;">الإجمالي</div></div>
+                            <div class="stat-card" style="background:white; padding:20px; border-radius:15px; text-align:center; box-shadow:0 5px 15px rgba(0,0,0,0.05); border: 2px solid #e2e8f0;"><div class="stat-number" id="stat-orphans" style="font-size:34px; font-weight:900; color:#db2777;">0</div><div class="stat-label" style="color:#64748b; font-weight:800;">أيتام</div></div>
+                            <div class="stat-card" style="background:white; padding:20px; border-radius:15px; text-align:center; box-shadow:0 5px 15px rgba(0,0,0,0.05); border: 2px solid #e2e8f0;"><div class="stat-number" id="stat-widows" style="font-size:34px; font-weight:900; color:#7c3aed;">0</div><div class="stat-label" style="color:#64748b; font-weight:800;">أرامل</div></div>
+                            <div class="stat-card" style="background:white; padding:20px; border-radius:15px; text-align:center; box-shadow:0 5px 15px rgba(0,0,0,0.05); border: 2px solid #e2e8f0;"><div class="stat-number" id="stat-divorced" style="font-size:34px; font-weight:900; color:#ea580c;">0</div><div class="stat-label" style="color:#64748b; font-weight:800;">مطلقات</div></div>
+                            <div class="stat-card" style="background:white; padding:20px; border-radius:15px; text-align:center; box-shadow:0 5px 15px rgba(0,0,0,0.05); border: 2px solid #e2e8f0;"><div class="stat-number" id="stat-poor" style="font-size:34px; font-weight:900; color:#059669;">0</div><div class="stat-label" style="color:#64748b; font-weight:800;">فقير</div></div>
+                            <div class="stat-card" style="background:white; padding:20px; border-radius:15px; text-align:center; box-shadow:0 5px 15px rgba(0,0,0,0.05); border: 2px solid #e2e8f0;"><div class="stat-number" id="stat-special" style="font-size:34px; font-weight:900; color:#2563eb;">0</div><div class="stat-label" style="color:#64748b; font-weight:800;">إعاقة</div></div>
                         </div>
                     </div>
-                    <div class="chart-container" style="flex: 1; min-width: 300px; background:white; padding:20px; border-radius:20px; border: 2px solid #e2e8f0;"><canvas id="categoryChart"></canvas></div>
+                    <div class="chart-container" style="flex: 1; min-width: 300px; background:white; padding:20px; border-radius:20px; border: 2px solid #e2e8f0; max-height: 280px;"><canvas id="categoryChart"></canvas></div>
                 </div>
-                <hr style="border: 2px solid #e2e8f0; margin: 40px 0;">
-                <div class="search-bar" style="margin-bottom: 20px;"><input type="text" id="searchInput" placeholder="بحث سريع..." onkeyup="filterTables()"></div>
+                <hr style="border: 2px solid #e2e8f0; margin: 35px 0;">
+                <div class="search-bar" style="margin-bottom: 20px;"><input type="text" id="searchInput" placeholder="بحث سريع بالاسم أو البطاقة..." onkeyup="filterTables()"></div>
                 <div class="tab-buttons">
                     <button class="tab-btn active" onclick="showCategoryTable('ايتام', this)">الأيتام</button>
                     <button class="tab-btn" onclick="showCategoryTable('ارملة', this)">الأرامل</button>
@@ -308,17 +375,17 @@
                 <div class="table-container" id="tablesContainer"></div>
             </div>
 
-            <!-- ================= 6. الإعدادات ================= -->
+            <!-- ================= 6. الإعدادات والحماية ================= -->
             <div id="settingsPage" class="page-section glass-panel">
-                <h2 style="color: var(--primary); font-size: 32px; font-weight: 900; margin-bottom: 30px;">الإعدادات وقاعدة البيانات</h2>
+                <h2 style="color: var(--primary); font-size: 30px; font-weight: 900; margin-bottom: 25px;">الإعدادات، قاعدة البيانات، وإدارة الحماية</h2>
                 
-                <!-- القسم الجديد: إضافة عائلة يدوياً -->
-                <div style="background: white; padding: 30px; border-radius: 20px; border: 2px solid var(--accent); margin-bottom: 40px;">
-                    <h3 style="color: var(--accent); margin-top: 0; font-size: 24px;"><i class="fas fa-user-plus"></i> إضافة مستفيد يدوياً (إدخال مباشر)</h3>
-                    <p style="color: #64748b; margin-bottom: 20px;">استخدم هذا القسم لإضافة عائلة جديدة دون الحاجة لرفع ملف وحذف البيانات القديمة.</p>
+                <!-- 1. إضافة عائلة يدوياً -->
+                <div style="background: white; padding: 28px; border-radius: 20px; border: 2px solid var(--accent); margin-bottom: 30px;">
+                    <h3 style="color: var(--accent); margin-top: 0; font-size: 23px;"><i class="fas fa-user-plus"></i> إضافة أو تعديل مستفيد يدوياً (إدخال مباشر)</h3>
+                    <p style="color: #64748b; margin-bottom: 18px; font-size:16px;">استخدم هذا القسم لإضافة عائلة جديدة أو تحديث بياناتها دون الحاجة لرفع ملف إكسل.</p>
                     <div style="display: flex; gap: 15px; flex-wrap: wrap;">
-                        <input type="text" id="manualCardId" placeholder="رقم البطاقة" style="flex: 1; min-width: 200px;">
-                        <input type="text" id="manualName" placeholder="الاسم الكامل" style="flex: 2; min-width: 250px;">
+                        <input type="text" id="manualCardId" placeholder="رقم البطاقة" style="flex: 1; min-width: 180px;">
+                        <input type="text" id="manualName" placeholder="الاسم الكامل" style="flex: 2; min-width: 240px;">
                         <select id="manualCategory" style="flex: 1; min-width: 150px;">
                             <option value="ايتام">أيتام</option>
                             <option value="ارملة">أرامل</option>
@@ -326,18 +393,41 @@
                             <option value="فقير">فقراء</option>
                             <option value="إعاقة">إعاقة</option>
                         </select>
-                        <input type="text" id="manualPhone" placeholder="الجوال (اختياري)" style="flex: 1; min-width: 200px;">
+                        <input type="text" id="manualPhone" placeholder="الجوال (مثال: 0912345678)" style="flex: 1; min-width: 200px;">
                     </div>
-                    <button class="btn btn-primary" onclick="addManualBeneficiary()" style="width: 100%; font-size: 22px; margin-top: 10px;"><i class="fas fa-save"></i> حفظ المستفيد في القاعدة</button>
+                    <button class="btn btn-primary" onclick="addManualBeneficiary()" style="width: 100%; font-size: 20px;"><i class="fas fa-save"></i> حفظ المستفيد في القاعدة</button>
                 </div>
 
-                <!-- قسم الرفع القديم -->
-                <div style="border: 4px dashed var(--danger); padding: 40px 30px; border-radius: 25px; text-align: center; background: #fef2f2;">
-                    <h3 style="color: var(--danger); margin-top: 0;"><i class="fas fa-exclamation-triangle"></i> تحديث شامل (رفع ملف إكسل)</h3>
-                    <p style="font-size: 20px; font-weight: 900; color: #991b1b; margin-bottom: 30px;">تحذير: رفع ملف جديد سيمسح جميع الأسماء الحالية نهائياً ويستبدلها بالملف الجديد.</p>
-                    <label for="fileUpload" class="btn btn-danger" style="font-size: 24px; padding: 15px 40px;">اختيار ملف Excel للرفع</label>
+                <!-- 2. إدارة كلمات المرور المشفرة SHA-256 -->
+                <div style="background: white; padding: 28px; border-radius: 20px; border: 2px solid var(--gold); margin-bottom: 30px;">
+                    <h3 style="color: var(--primary); margin-top: 0; font-size: 23px;"><i class="fas fa-key" style="color:var(--gold);"></i> تغيير كلمات المرور (تشفير SHA-256)</h3>
+                    <p style="color: #64748b; margin-bottom: 18px; font-size:16px;">يتم حفظ كلمات المرور مشفرة بـ SHA-256 في قاعدة البيانات بحيث لا تظهر أبداً في الكود المصدري.</p>
+                    <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                        <div style="flex:1; min-width:240px;">
+                            <label style="font-weight:800; font-size:16px; display:block; margin-bottom:6px;">كلمة مرور الإدارة الجديدة:</label>
+                            <input type="password" id="newAdminPass" placeholder="اتركها فارغة إذا لا تريد تغييرها">
+                        </div>
+                        <div style="flex:1; min-width:240px;">
+                            <label style="font-weight:800; font-size:16px; display:block; margin-bottom:6px;">كلمة مرور المتطوعين الجديدة:</label>
+                            <input type="password" id="newVolPass" placeholder="اتركها فارغة إذا لا تريد تغييرها">
+                        </div>
+                    </div>
+                    <button class="btn btn-warning" onclick="updateSystemPasswords()" style="width: 100%; font-size: 20px;"><i class="fas fa-shield-alt"></i> تحديث وتشفير كلمات المرور</button>
+                </div>
+
+                <!-- 3. قسم رفع ملف الإكسل السريع (Batch Writes) -->
+                <div style="border: 3px dashed var(--danger); padding: 35px 25px; border-radius: 25px; text-align: center; background: #fef2f2;">
+                    <h3 style="color: var(--danger); margin-top: 0;"><i class="fas fa-file-excel"></i> رفع ملف إكسل للمستفيدين (نظام الدفعات السريع Batch)</h3>
+                    <div style="max-width:500px; margin:0 auto 20px auto; text-align:right;">
+                        <label style="font-weight:900; color:#991b1b; display:block; margin-bottom:8px;">اختر طريقة الرفع:</label>
+                        <select id="excelUploadMode" style="border-color:var(--danger);">
+                            <option value="merge">دمج وتحديث (إضافة الأسماء الجديدة وتحديث الحالية دون مسح القديم - موصى به)</option>
+                            <option value="replace">استبدال شامل (مسح جميع المستفيدين القدامى ورفع الملف الجديد فقط)</option>
+                        </select>
+                    </div>
+                    <label for="fileUpload" class="btn btn-danger" style="font-size: 22px; padding: 15px 40px;">اختيار ملف Excel للرفع</label>
                     <input type="file" id="fileUpload" accept=".xlsx, .xls" style="display: none;" />
-                    <div id="uploadStatus" style="margin-top: 20px; font-weight: 900; font-size: 22px;"></div>
+                    <div id="uploadStatus" style="margin-top: 20px; font-weight: 900; font-size: 21px; color: var(--primary);"></div>
                 </div>
             </div>
 
@@ -346,7 +436,8 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getFirestore, collection, setDoc, doc, getDoc, getDocs, deleteDoc, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import { getFirestore, collection, setDoc, doc, getDoc, getDocs, deleteDoc, query, where, onSnapshot, writeBatch } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyA1GTSVUrUJXjNU0m6cRFCgswpmHYPg3A0",
@@ -359,10 +450,13 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        const auth = getAuth(app);
         
         let html5QrCode = null;
+        let isProcessingScan = false;
         let allBeneficiaries = []; 
         let allDeliveriesGlobal = []; 
+        let campaignsMetaMap = {}; // يخزن معلومات كل حملة (الفئة والمواد والتاريخ)
         let missedListForExport = []; 
         let doneListForExport = []; 
         let currentReportTab = 'missed'; 
@@ -373,37 +467,156 @@
         let activeCampaign = { isOpen: false, category: 'الكل', items: [], campaign_id: 0 };
         let smsRealTimeData = [];
         let unsubscribeSms = null;
+        let unsubscribeBotStatus = null;
+        let smsRenderTimeout = null;
+
+        // بصمات SHA-256 الافتراضية (لا توجد كلمات مرور نصية مكشوفة في الكود)
+        const DEFAULT_ADMIN_HASH = "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9";
+        const DEFAULT_VOL_HASH   = "b6a1283385dd04a8a5724dfd3fc1779ef1c08d752c65db1bdd634a3034a3ca00";
 
         const playSound = (type) => { try { document.getElementById(type === 'success' ? 'audioSuccess' : 'audioError').play(); } catch(e){} };
 
-        // --- تسجيل الدخول ---
-        window.handleLoginPress = function(e) { if(e.key === 'Enter') checkLogin(); }
-        window.checkLogin = function() {
-            const pass = document.getElementById('loginPassword').value;
-            if(pass === 'admin123') {
-                currentUserRole = "admin"; document.getElementById('userBadge').innerHTML = 'صلاحيات الإدارة';
-                document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block'); loginSuccess();
-            } else if (pass === 'vol123') {
-                currentUserRole = "volunteer"; document.getElementById('userBadge').innerHTML = 'صلاحيات متطوع';
-                document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none'); loginSuccess();
-            } else document.getElementById('loginError').style.display = 'block';
+        // --- دالة حماية النصوص ضد ثغرات XSS ---
+        function escapeHtml(unsafe) {
+            if (unsafe === null || unsafe === undefined) return "";
+            return String(unsafe)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        // --- دالة تشفير SHA-256 لكلمات المرور ---
+        async function sha256(text) {
+            const msgBuffer = new TextEncoder().encode(text.trim());
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        // --- دالة تنفيذ العمليات في دفعات (writeBatch) لحماية حصة Firebase ---
+        async function executeBatchOperations(operations, onProgress) {
+            const CHUNK_SIZE = 450; // الحد الأقصى في فايربيس 500 لكل دفعة
+            for (let i = 0; i < operations.length; i += CHUNK_SIZE) {
+                const chunk = operations.slice(i, i + CHUNK_SIZE);
+                const batch = writeBatch(db);
+                chunk.forEach(op => {
+                    if (op.type === 'set') batch.set(op.ref, op.data, op.options || {});
+                    else if (op.type === 'delete') batch.delete(op.ref);
+                });
+                await batch.commit();
+                if (onProgress) onProgress(Math.min(i + CHUNK_SIZE, operations.length), operations.length);
+            }
+        }
+
+        // --- تسجيل الدخول المحمي ---
+        window.handleLoginPress = function(e) { if(e.key === 'Enter') checkLogin(); };
+        window.checkLogin = async function() {
+            const passInput = document.getElementById('loginPassword').value;
+            const loginBtn = document.getElementById('loginBtn');
+            const errDiv = document.getElementById('loginError');
+            if(!passInput) return;
+
+            loginBtn.disabled = true;
+            errDiv.style.display = 'none';
+
+            try {
+                // محاولة تسجيل الدخول المجهول في Firebase لتفعيل قواعد الأمان إن كانت مفعلة
+                try { await signInAnonymously(auth); } catch(authErr) { console.warn("Anonymous auth note:", authErr.message); }
+
+                const inputHash = await sha256(passInput);
+                let adminHash = DEFAULT_ADMIN_HASH;
+                let volHash = DEFAULT_VOL_HASH;
+
+                try {
+                    const secSnap = await getDoc(doc(db, "settings", "security_config"));
+                    if (secSnap.exists()) {
+                        const secData = secSnap.data();
+                        if (secData.admin_hash) adminHash = secData.admin_hash;
+                        if (secData.vol_hash) volHash = secData.vol_hash;
+                    }
+                } catch(e) {}
+
+                if (inputHash === adminHash) {
+                    currentUserRole = "admin";
+                    document.getElementById('userBadge').innerHTML = '<i class="fas fa-user-shield"></i> صلاحيات الإدارة';
+                    document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block');
+                    loginSuccess();
+                } else if (inputHash === volHash) {
+                    currentUserRole = "volunteer";
+                    document.getElementById('userBadge').innerHTML = '<i class="fas fa-user-check"></i> صلاحيات متطوع';
+                    document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
+                    loginSuccess();
+                } else {
+                    errDiv.style.display = 'block';
+                    playSound('error');
+                }
+            } finally {
+                loginBtn.disabled = false;
+            }
         };
 
-        function loginSuccess() {
+        async function loginSuccess() {
             document.getElementById('loginOverlay').style.display = 'none'; 
             document.getElementById('mainApp').style.display = 'block';
             switchPage('scannerPage', document.querySelector('.navbar button:first-child'));
             listenToCampaign(); 
-            if(currentUserRole === 'admin') { loadStats(); fetchAllDeliveries(); }
+            if(currentUserRole === 'admin') {
+                await fetchCampaignsMeta();
+                loadStats();
+                fetchAllDeliveries();
+                loadWhatsappSettings();
+            }
         }
         window.logout = function() { location.reload(); };
 
+        // --- تغيير كلمات المرور من الإعدادات ---
+        window.updateSystemPasswords = async function() {
+            const newAdmin = document.getElementById('newAdminPass').value.trim();
+            const newVol = document.getElementById('newVolPass').value.trim();
+            if (!newAdmin && !newVol) return alert("الرجاء إدخال كلمة مرور جديدة واحدة على الأقل.");
+
+            try {
+                const updates = {};
+                if (newAdmin) updates.admin_hash = await sha256(newAdmin);
+                if (newVol) updates.vol_hash = await sha256(newVol);
+                updates.updated_at = new Date().toLocaleString('ar-EG');
+
+                await setDoc(doc(db, "settings", "security_config"), updates, { merge: true });
+                document.getElementById('newAdminPass').value = '';
+                document.getElementById('newVolPass').value = '';
+                playSound('success');
+                alert("تم تشفير وتحديث كلمات المرور في قاعدة البيانات بنجاح!");
+            } catch(e) {
+                alert("حدث خطأ أثناء تحديث كلمات المرور.");
+            }
+        };
+
+        // --- التنقل بين الصفحات وإيقاف المستمعين غير الضروريين لتوفير حصة Firebase ---
         window.switchPage = function(pageId, btnElement) {
             document.querySelectorAll('.page-section').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
-            document.getElementById(pageId).classList.add('active'); btnElement.classList.add('active');
-            if (pageId !== 'scannerPage' && html5QrCode) { try { html5QrCode.stop(); document.getElementById('reader').style.display='none'; } catch(e){} }
+            document.getElementById(pageId).classList.add('active');
+            if (btnElement) btnElement.classList.add('active');
+
+            if (pageId !== 'scannerPage' && html5QrCode) {
+                try { html5QrCode.stop(); document.getElementById('reader').style.display='none'; } catch(e){}
+            }
+            // إيقاف مستمع الواتساب عند الخروج من تبويب الواتساب لمنع استهلاك القراءات في الخلفية
+            if (pageId !== 'smsPage') {
+                if (unsubscribeSms) { unsubscribeSms(); unsubscribeSms = null; }
+                if (unsubscribeBotStatus) { unsubscribeBotStatus(); unsubscribeBotStatus = null; }
+            }
         };
+
+        // --- جلب وحفظ بيانات الحملات الوصفية (Campaigns Meta) ---
+        async function fetchCampaignsMeta() {
+            try {
+                const snap = await getDoc(doc(db, "settings", "campaigns_meta"));
+                if (snap.exists()) campaignsMetaMap = snap.data().campaigns || {};
+            } catch(e) {}
+        }
 
         // --- إدارة الحملة المركزية وترقيمها ---
         window.listenToCampaign = function() {
@@ -427,12 +640,139 @@
                 document.getElementById('volActiveCampId').innerText = activeCampaign.campaign_id;
                 const select = document.getElementById('volItemSelect'); select.innerHTML = '';
                 if(activeCampaign.items && activeCampaign.items.length > 0) {
-                    activeCampaign.items.forEach(item => { select.innerHTML += `<option value="${item}">${item}</option>`; });
-                } else select.innerHTML = `<option value="مواد عامة">مواد عامة</option>`;
+                    activeCampaign.items.forEach(item => {
+                        const opt = document.createElement('option');
+                        opt.value = item;
+                        opt.textContent = item;
+                        select.appendChild(opt);
+                    });
+                } else {
+                    select.innerHTML = `<option value="مواد عامة">مواد عامة</option>`;
+                }
             } else {
                 closedMsg.style.display = 'block'; activeSection.style.display = 'none';
                 if (html5QrCode) { try { html5QrCode.stop(); document.getElementById('reader').style.display='none'; } catch(e){} }
             }
+        };
+
+        // --- دالة تصدير أرشيف كامل لحملة معينة (المستلمين + غير المستلمين في ملف إكسل واحد) ---
+        async function exportCampaignFullExcel(campId, campDeliveries) {
+            if (allBeneficiaries.length === 0) await fetchAllBeneficiaries();
+            await fetchCampaignsMeta();
+
+            const campMeta = campaignsMetaMap[String(campId)] || {};
+            const targetCat = campMeta.category || "الكل";
+            const campItems = (campMeta.items && campMeta.items.length > 0) ? campMeta.items.join("، ") : "توزيع عام";
+
+            // المستلمون في هذه الحملة
+            const receivedRows = campDeliveries.map(d => ({
+                "رقم التوزيع": String(campId),
+                "رقم البطاقة": String(d.card_id || ""),
+                "الاسم الكامل": String(d.name || ""),
+                "الفئة": String(d.category || ""),
+                "المادة المستلمة": String(d.item_name || ""),
+                "تاريخ ووقت التسليم": String(d.date || "")
+            }));
+
+            // معرفة البطاقات التي استلمت أي مادة في هذه الحملة
+            const receivedSet = new Set(campDeliveries.map(d => String(d.card_id)));
+
+            // غير المستلمين (مفلترين حسب الفئة المستهدفة في تلك الحملة)
+            const eligibleBeneficiaries = allBeneficiaries.filter(b => {
+                if (targetCat === "الكل") return true;
+                const bc = b.category || "";
+                if (targetCat === 'فقير') return bc.includes('فقير') || bc.includes('فقراء');
+                if (targetCat === 'إعاقة') return bc.includes('إعاقة') || bc.includes('اعاقة');
+                return bc.includes(targetCat);
+            });
+
+            const missedRows = eligibleBeneficiaries
+                .filter(b => !receivedSet.has(String(b.card_id)))
+                .map(b => ({
+                    "رقم التوزيع": String(campId),
+                    "رقم البطاقة": String(b.card_id || ""),
+                    "الاسم الكامل": String(b.name || ""),
+                    "الفئة": String(b.category || ""),
+                    "الجوال": String(b.phone || ""),
+                    "الحالة": "لم يستلم في هذه الحملة"
+                }));
+
+            const workbook = XLSX.utils.book_new();
+            const wsDone = XLSX.utils.json_to_sheet(receivedRows.length > 0 ? receivedRows : [{"ملاحظة": "لا يوجد مستلمين مسجلين"}]);
+            const wsMissed = XLSX.utils.json_to_sheet(missedRows.length > 0 ? missedRows : [{"ملاحظة": "الجميع استلم"}]);
+
+            XLSX.utils.book_append_sheet(workbook, wsDone, "المستلمين");
+            XLSX.utils.book_append_sheet(workbook, wsMissed, "غير المستلمين");
+
+            const fileName = `أرشيف_التوزيع_رقم_${campId}_الفئة_${targetCat}.xlsx`;
+            XLSX.writeFile(workbook, fileName);
+            return fileName;
+        }
+
+        // --- فحص وأرشفة وحذف الحملات الأقدم لإبقاء آخر 3 حملات فقط على مستوى التطبيق ---
+        window.checkAndCleanOldCampaigns = async function(isLaunchingNew = false) {
+            const snap = await getDocs(collection(db, "deliveries"));
+            const allDocs = [];
+            snap.forEach(d => allDocs.push({ docId: d.id, ...d.data() }));
+
+            // استخراج أرقام الحملات الفريدة الموجودة حالياً في قاعدة البيانات
+            const campMap = new Map();
+            allDocs.forEach(d => {
+                const cId = d.campaign_id ? Number(d.campaign_id) : 0;
+                if (!campMap.has(cId)) campMap.set(cId, []);
+                campMap.get(cId).push(d);
+            });
+
+            // ترتيب أرقام الحملات تنازلياً (الأحدث أولاً)
+            const sortedCampIds = Array.from(campMap.keys()).sort((a, b) => b - a);
+
+            // إذا كنا نطلق حملة جديدة، نحتفظ بآخر حملتين في القاعدة ليصبح المجموع مع الجديدة 3 حملات
+            // وإذا كان فحصاً يدوياً، نحتفظ بآخر 3 حملات موجودة
+            const maxToKeep = isLaunchingNew ? 2 : 3;
+
+            if (sortedCampIds.length <= maxToKeep) {
+                if (!isLaunchingNew) alert(`عدد الحملات المحفوظة حالياً هو (${sortedCampIds.length}) فقط، ولا توجد حملات قديمة بحاجة للأرشفة والحذف.`);
+                return true;
+            }
+
+            const campaignsToDelete = sortedCampIds.slice(maxToKeep);
+
+            for (const oldCampId of campaignsToDelete) {
+                const oldDocs = campMap.get(oldCampId);
+                const campLabel = oldCampId === 0 ? "القديم (بدون رقم)" : oldCampId;
+
+                // 1. تنزيل ملف الإكسل الأرشيفي تلقائياً قبل الحذف
+                const downloadedFile = await exportCampaignFullExcel(oldCampId, oldDocs);
+
+                // 2. سؤال المدير للتأكيد بعد تنزيل الأرشيف
+                const confirmed = confirm(
+                    `📦 حفاظاً على حجم قاعدة البيانات (إبقاء آخر 3 توزيعات فقط):
+
+` +
+                    `تم الآن تنزيل ملف الأرشيف الكامل للتوزيع القديم رقم (${campLabel}) باسم:
+[${downloadedFile}]
+` +
+                    `ويحتوي على (${oldDocs.length}) سجل استلام بالإضافة لقائمة غير المستلمين.
+
+` +
+                    `هل تؤكد مسح سجلات التوزيع القديم رقم (${campLabel}) من قاعدة البيانات السحابية الآن؟`
+                );
+
+                if (!confirmed) {
+                    alert("تم إلغاء عملية المسح، وتم الاحتفاظ بالبيانات كما هي.");
+                    return false;
+                }
+
+                // 3. مسح سجلات الحملة القديمة بدفعات سريعة (writeBatch)
+                const deleteOps = oldDocs.map(d => ({
+                    type: 'delete',
+                    ref: doc(db, "deliveries", d.docId)
+                }));
+                await executeBatchOperations(deleteOps);
+            }
+
+            await fetchAllDeliveries();
+            return true;
         };
 
         window.launchCampaign = async function() {
@@ -441,7 +781,14 @@
             if(!itemsStr.trim()) return alert("الرجاء كتابة اسم مادة واحدة على الأقل لإطلاق الحملة!");
             const itemsArray = itemsStr.split(',').map(item => item.trim()).filter(item => item !== "");
             
+            const btn = document.getElementById('btnLaunchCamp');
+            btn.disabled = true;
+
             try {
+                // أولاً: فحص إذا كان هناك أكثر من حملتين سابقتين لتنزيل أرشيف الأقدم ومسحها قبل فتح الحملة الجديدة
+                const canProceed = await window.checkAndCleanOldCampaigns(true);
+                if (!canProceed) return;
+
                 // قراءة العداد العام للحملات لزيادته
                 const counterRef = doc(db, "settings", "campaign_counter");
                 const counterSnap = await getDoc(counterRef);
@@ -449,77 +796,120 @@
                 if(counterSnap.exists()) currentId = (counterSnap.data().last_id || 0) + 1;
                 
                 await setDoc(counterRef, { last_id: currentId });
-                await setDoc(doc(db, "settings", "distribution_session"), { isOpen: true, category: cat, items: itemsArray, campaign_id: currentId });
+                await setDoc(doc(db, "settings", "distribution_session"), {
+                    isOpen: true,
+                    category: cat,
+                    items: itemsArray,
+                    campaign_id: currentId,
+                    launched_at: new Date().toLocaleString('ar-EG')
+                });
+
+                // حفظ وصف الحملة في campaigns_meta لضمان دقة التقارير والأرشيف لاحقاً
+                campaignsMetaMap[String(currentId)] = {
+                    campaign_id: currentId,
+                    category: cat,
+                    items: itemsArray,
+                    date: new Date().toLocaleString('ar-EG')
+                };
+                await setDoc(doc(db, "settings", "campaigns_meta"), { campaigns: campaignsMetaMap }, { merge: true });
+
+                playSound('success');
                 alert(`تم إطلاق الحملة بنجاح! رقم التوزيع هو: ${currentId}`);
-            } catch(e) { alert("خطأ اتصال."); }
+            } catch(e) {
+                console.error(e);
+                alert("خطأ اتصال أثناء إطلاق الحملة.");
+            } finally {
+                btn.disabled = false;
+            }
         };
+
         window.stopCampaign = async function() {
             try { await setDoc(doc(db, "settings", "distribution_session"), { isOpen: false }, { merge: true }); alert("تم إغلاق الحملة."); } 
             catch(e) { alert("خطأ اتصال."); }
         };
 
-        // --- نظام التوزيع والاحتفاظ بـ 3 توزيعات فقط ---
+        // --- نظام التوزيع السريع والمحمي عند مسح الباركود ---
         window.checkBeneficiary = async function(qrText) {
-            const resultBox = document.getElementById('resultBox'); const resultText = document.getElementById('resultText');
+            if (isProcessingScan) return;
+            isProcessingScan = true;
+
+            const resultBox = document.getElementById('resultBox');
+            const resultText = document.getElementById('resultText');
             document.getElementById('loadingScanner').style.display = 'block';
-            let scannedCardId = qrText.trim(); const match = qrText.match(/رقم البطاقة:\s*(\d+)/); if (match && match[1]) scannedCardId = match[1];
-            const selectedCat = activeCampaign.category; const itemName = document.getElementById('volItemSelect').value;
+
+            let scannedCardId = qrText.trim();
+            const match = qrText.match(/رقم البطاقة:\s*(\d+)/);
+            if (match && match[1]) scannedCardId = match[1];
+
+            const selectedCat = activeCampaign.category;
+            const itemName = document.getElementById('volItemSelect').value;
             const campId = activeCampaign.campaign_id;
 
             try {
-                const docRef = doc(db, "beneficiaries", scannedCardId); const docSnap = await getDoc(docRef);
+                const docRef = doc(db, "beneficiaries", scannedCardId);
+                const docSnap = await getDoc(docRef);
                 
                 if (!docSnap.exists()) {
-                    document.getElementById('loadingScanner').style.display = 'none'; resultBox.style.display = 'block';
-                    resultBox.style.background = "linear-gradient(135deg, var(--danger), #991b1b)"; resultText.innerHTML = `البطاقة غير معرفة في النظام`; playSound('error');
+                    document.getElementById('loadingScanner').style.display = 'none';
+                    resultBox.style.display = 'block';
+                    resultBox.style.background = "linear-gradient(135deg, var(--danger), #991b1b)";
+                    resultText.innerHTML = `البطاقة (${escapeHtml(scannedCardId)}) غير معرفة في النظام`;
+                    playSound('error');
                     return;
                 }
 
-                const data = docSnap.data(); const benCat = data.category || "";
+                const data = docSnap.data();
+                const benCat = data.category || "";
+                const safeName = escapeHtml(data.name);
+
                 if (selectedCat !== "الكل" && !benCat.includes(selectedCat)) {
-                    document.getElementById('loadingScanner').style.display = 'none'; resultBox.style.display = 'block';
+                    document.getElementById('loadingScanner').style.display = 'none';
+                    resultBox.style.display = 'block';
                     resultBox.style.background = "linear-gradient(135deg, var(--danger), #991b1b)";
-                    resultText.innerHTML = `مرفوض<br><span style="font-size:20px;">هذه الحملة مخصصة لفئة (${selectedCat}) فقط</span><br>${data.name}`;
-                    playSound('error'); return;
+                    resultText.innerHTML = `مرفوض<br><span style="font-size:20px;">هذه الحملة مخصصة لفئة (${escapeHtml(selectedCat)}) فقط</span><br>${safeName}`;
+                    playSound('error');
+                    return;
                 }
                 
-                // التأكد من عدم الاستلام مسبقاً في نفس الحملة (رقم التوزيع)
-                const deliveryId = `${scannedCardId}_camp_${campId}_${itemName}`;
-                const deliveryRef = doc(db, "deliveries", deliveryId); const deliverySnap = await getDoc(deliveryRef);
+                // معرف فريد للاستلام يجمع البطاقة ورقم الحملة والمادة
+                const safeItemKey = itemName.replace(/[\/\#?]/g, '_');
+                const deliveryId = `${scannedCardId}_camp_${campId}_${safeItemKey}`;
+                const deliveryRef = doc(db, "deliveries", deliveryId);
+                const deliverySnap = await getDoc(deliveryRef);
 
-                document.getElementById('loadingScanner').style.display = 'none'; resultBox.style.display = 'block';
+                document.getElementById('loadingScanner').style.display = 'none';
+                resultBox.style.display = 'block';
 
                 if (deliverySnap.exists()) {
                     resultBox.style.background = "linear-gradient(135deg, var(--warning), #b45309)";
-                    resultText.innerHTML = `مرفوض<br><span style="font-size:20px;">لقد استلم مادة (${itemName}) في التوزيع رقم ${campId} مسبقاً</span><br>${data.name}`;
+                    resultText.innerHTML = `مرفوض (مكرر)<br><span style="font-size:20px;">استلم مادة (${escapeHtml(itemName)}) في التوزيع رقم ${escapeHtml(campId)} مسبقاً</span><br>${safeName}`;
                     playSound('error');
                 } else {
                     const timestamp = new Date().toLocaleString('ar-EG');
                     const timeMs = Date.now();
-                    // تخزين الاستلام مع رقم الحملة
-                    await setDoc(deliveryRef, { card_id: scannedCardId, name: data.name, date: timestamp, timestamp_ms: timeMs, category: benCat, item_name: itemName, campaign_id: campId });
-                    
-                    // --- دالة حذف القديم للحفاظ على آخر 3 توزيعات فقط ---
-                    const qUserDel = query(collection(db, "deliveries"), where("card_id", "==", scannedCardId));
-                    const userDelSnap = await getDocs(qUserDel);
-                    let userDeliveries = [];
-                    userDelSnap.forEach(d => userDeliveries.push({...d.data(), docId: d.id}));
-                    
-                    if(userDeliveries.length > 3) {
-                        // ترتيب تنازلي حسب الوقت
-                        userDeliveries.sort((a,b) => (b.timestamp_ms || 0) - (a.timestamp_ms || 0));
-                        // حذف ما بعد الثالث
-                        for(let i=3; i<userDeliveries.length; i++) {
-                            await deleteDoc(doc(db, "deliveries", userDeliveries[i].docId));
-                        }
-                    }
-                    // ----------------------------------------------------
+                    await setDoc(deliveryRef, {
+                        card_id: String(scannedCardId),
+                        name: data.name || "",
+                        date: timestamp,
+                        timestamp_ms: timeMs,
+                        category: benCat,
+                        item_name: itemName,
+                        campaign_id: campId
+                    });
 
                     resultBox.style.background = "linear-gradient(135deg, var(--success), #047857)";
-                    resultText.innerHTML = `تم التسليم بنجاح<br><span style="font-size:26px; color:#d1fae5; font-weight:900;">[ ${itemName} ]</span><br>${data.name}`;
+                    resultText.innerHTML = `تم التسليم بنجاح ✔️<br><span style="font-size:26px; color:#d1fae5; font-weight:900;">[ ${escapeHtml(itemName)} ]</span><br>${safeName}`;
                     playSound('success');
                 }
-            } catch (error) { document.getElementById('loadingScanner').style.display = 'none'; resultBox.style.display = 'block'; resultBox.style.background = "var(--danger)"; resultText.innerHTML = "خطأ اتصال بالشبكة"; playSound('error'); }
+            } catch (error) {
+                document.getElementById('loadingScanner').style.display = 'none';
+                resultBox.style.display = 'block';
+                resultBox.style.background = "var(--danger)";
+                resultText.innerHTML = "خطأ اتصال بالشبكة، يرجى المحاولة مرة أخرى";
+                playSound('error');
+            } finally {
+                isProcessingScan = false;
+            }
         };
 
         window.startScanner = function() {
@@ -543,103 +933,353 @@
             if(!id || !name) return alert("يجب إدخال رقم البطاقة والاسم على الأقل.");
             
             try {
-                await setDoc(doc(db, "beneficiaries", id), { card_id: id, name: name, category: cat, phone: phone });
-                alert("تم إضافة المستفيد بنجاح دون التأثير على البيانات القديمة!");
-                document.getElementById('manualCardId').value = ''; document.getElementById('manualName').value = ''; document.getElementById('manualPhone').value = '';
+                await setDoc(doc(db, "beneficiaries", id), { card_id: id, name: name, category: cat, phone: phone }, { merge: true });
+                alert("تم حفظ بيانات المستفيد بنجاح!");
+                document.getElementById('manualCardId').value = '';
+                document.getElementById('manualName').value = '';
+                document.getElementById('manualPhone').value = '';
                 if(currentUserRole === 'admin') { await fetchAllBeneficiaries(); loadStats(); }
-            } catch(e) { alert("حدث خطأ في الإضافة."); }
+            } catch(e) { alert("حدث خطأ في الحفظ."); }
         };
 
-        // --- بوابة الـ SMS ---
+        // --- بوابة الواتساب المطورة (إرسال فقط بدون رد + توفير قراءات Firebase) ---
+        window.insertTemplateTag = function(tag) {
+            const textarea = document.getElementById('whatsappMessageTemplate');
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            const text = textarea.value;
+            textarea.value = text.substring(0, start) + tag + text.substring(end);
+            textarea.focus();
+        };
+
+        async function loadWhatsappSettings() {
+            try {
+                const snap = await getDoc(doc(db, "settings", "whatsapp_config"));
+                if (snap.exists()) {
+                    const data = snap.data();
+                    if (data.country_code) document.getElementById('whatsappCountryCode').value = data.country_code;
+                    if (data.message_template) document.getElementById('whatsappMessageTemplate').value = data.message_template;
+                }
+            } catch(e) {}
+        }
+
+        window.saveWhatsappSettings = async function() {
+            const code = document.getElementById('whatsappCountryCode').value;
+            const tpl = document.getElementById('whatsappMessageTemplate').value;
+            try {
+                await setDoc(doc(db, "settings", "whatsapp_config"), {
+                    country_code: code,
+                    message_template: tpl,
+                    updated_at: Date.now()
+                }, { merge: true });
+            } catch(e) {}
+        };
+
+        function buildPersonalizedMessage(beneficiary) {
+            const tpl = document.getElementById('whatsappMessageTemplate').value.trim() || "يرجى مراجعة جمعية الدر المكنون لاستلام المخصصات.";
+            const campText = (activeCampaign.items && activeCampaign.items.length > 0) ? activeCampaign.items.join("، ") : `التوزيع رقم ${activeCampaign.campaign_id || ''}`;
+            return tpl
+                .replace(/\{الاسم\}/g, beneficiary.name || "")
+                .replace(/\{رقم_البطاقة\}/g, beneficiary.card_id || "")
+                .replace(/\{الفئة\}/g, beneficiary.category || "")
+                .replace(/\{الحملة\}/g, campText);
+        }
+
         window.loadSmsData = function() {
             if (unsubscribeSms) unsubscribeSms();
+            if (unsubscribeBotStatus) unsubscribeBotStatus();
+
+            // مراقبة حالة اتصال بوت الواتساب
+            unsubscribeBotStatus = onSnapshot(doc(db, "settings", "whatsapp_bot_status"), (docSnap) => {
+                const badge = document.getElementById('whatsappBotStatusBadge');
+                if (docSnap.exists() && docSnap.data().online) {
+                    const lastSeen = docSnap.data().updated_at ? new Date(docSnap.data().updated_at).toLocaleTimeString('ar-EG') : '';
+                    badge.className = "bot-status-pill bot-online";
+                    badge.innerHTML = `<i class="fas fa-check-circle"></i> البوت متصل وجاهز للإرسال ${lastSeen ? '(' + escapeHtml(lastSeen) + ')' : ''}`;
+                } else {
+                    badge.className = "bot-status-pill bot-offline";
+                    badge.innerHTML = `<i class="fas fa-times-circle"></i> البوت غير متصل حالياً (شغّل ملف bot.js)`;
+                }
+            });
+
+            // مراقبة قائمة المستفيدين مع خاصية Debounce لمنع تجميد المتصفح عند التحديث الجماعي
             const q = query(collection(db, "beneficiaries"));
             unsubscribeSms = onSnapshot(q, (snapshot) => {
                 smsRealTimeData = [];
-                snapshot.forEach(doc => smsRealTimeData.push(doc.data()));
-                filterSmsTable();
+                snapshot.forEach(docSnap => smsRealTimeData.push(docSnap.data()));
+                if (smsRenderTimeout) clearTimeout(smsRenderTimeout);
+                smsRenderTimeout = setTimeout(() => {
+                    filterSmsTable();
+                }, 200);
             });
         };
+
         window.filterSmsTable = function() {
             const cat = document.getElementById('smsCategoryFilter').value;
             const search = document.getElementById('smsSearchInput').value.toLowerCase();
             let filtered = smsRealTimeData.filter(b => {
                 const matchCat = cat === 'الكل' || (b.category && b.category.includes(cat));
-                const matchSearch = (b.name && b.name.toLowerCase().includes(search)) || (b.card_id && b.card_id.includes(search));
+                const matchSearch = (b.name && b.name.toLowerCase().includes(search)) || (b.card_id && String(b.card_id).includes(search));
                 return matchCat && matchSearch;
             });
+
+            // تحديث عدادات الحالة
+            let pendingC = 0, sentC = 0, failedC = 0;
+            filtered.forEach(b => {
+                if (b.sms_status === 'pending') pendingC++;
+                else if (b.sms_status === 'sent') sentC++;
+                else if (b.sms_status === 'failed' || b.sms_status === 'no_number') failedC++;
+            });
+            document.getElementById('waCountTotal').innerText = filtered.length;
+            document.getElementById('waCountPending').innerText = pendingC;
+            document.getElementById('waCountSent').innerText = sentC;
+            document.getElementById('waCountFailed').innerText = failedC;
+
             renderSmsTable(filtered);
         };
+
         window.renderSmsTable = function(list) {
             const tbody = document.getElementById('smsTableBody');
-            if (list.length === 0) { tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding: 40px; font-weight: 900;">لا توجد أسماء مطابقة</td></tr>`; return; }
+            if (list.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding: 40px; font-weight: 900;">لا توجد أسماء مطابقة</td></tr>`;
+                return;
+            }
             let html = '';
             list.forEach(b => {
-                let statusText = 'لم يتم الإرسال'; let statusColor = '#64748b';
-                if (b.sms_status === 'pending') { statusText = 'قيد الانتظار... ⏳'; statusColor = 'var(--warning)'; }
-                else if (b.sms_status === 'sent') { statusText = 'تم الإرسال بنجاح ✔️'; statusColor = 'var(--success)'; }
-                else if (b.sms_status === 'failed') { statusText = 'فشل الإرسال ❌'; statusColor = 'var(--danger)'; }
+                let statusText = 'لم يتم الإرسال';
+                let statusColor = '#64748b';
+                if (b.sms_status === 'pending') { statusText = 'قيد الإرسال بالبوت... ⏳'; statusColor = 'var(--warning)'; }
+                else if (b.sms_status === 'sent') { statusText = 'تم الإرسال عبر واتساب ✔️'; statusColor = 'var(--success)'; }
+                else if (b.sms_status === 'failed') { statusText = `فشل الإرسال ❌ ${b.sms_error ? '(' + escapeHtml(b.sms_error) + ')' : ''}`; statusColor = 'var(--danger)'; }
                 else if (b.sms_status === 'no_number') { statusText = 'لا يوجد رقم هاتف ⚠️'; statusColor = 'var(--danger)'; }
 
+                const safeId = escapeHtml(b.card_id);
                 html += `<tr>
-                    <td style="text-align: center;"><input type="checkbox" class="sms-checkbox" value="${b.card_id}"></td>
-                    <td style="font-weight:900; font-size: 20px;">${b.card_id}</td>
-                    <td style="font-weight:900; color:var(--primary); font-size: 20px;">${b.name}</td>
-                    <td><span class="campaign-badge" style="font-size:14px; background:var(--secondary);">${b.category || '-'}</span></td>
-                    <td dir="ltr" style="font-weight: 900;">${b.phone || '-'}</td>
-                    <td style="color:${statusColor}; font-weight:900; font-size: 18px;">${statusText}</td>
-                    <td><button class="btn btn-primary" style="padding: 10px 20px; font-size: 18px;" onclick="sendSingleSms('${b.card_id}')">إرسال <i class="fas fa-paper-plane"></i></button></td>
+                    <td style="text-align: center;"><input type="checkbox" class="sms-checkbox" value="${safeId}"></td>
+                    <td style="font-weight:900; font-size: 19px;">${safeId}</td>
+                    <td style="font-weight:900; color:var(--primary); font-size: 19px;">${escapeHtml(b.name)}</td>
+                    <td><span class="campaign-badge" style="font-size:14px; background:var(--secondary);">${escapeHtml(b.category || '-')}</span></td>
+                    <td dir="ltr" style="font-weight: 900;">${escapeHtml(b.phone || '-')}</td>
+                    <td style="color:${statusColor}; font-weight:900; font-size: 17px;">${statusText}</td>
+                    <td><button class="btn btn-whatsapp" style="padding: 8px 16px; font-size: 16px;" data-cardid="${safeId}" onclick="sendSingleSms(this.getAttribute('data-cardid'))">إرسال <i class="fab fa-whatsapp"></i></button></td>
                 </tr>`;
             });
             tbody.innerHTML = html;
         };
-        window.toggleSelectAllSms = function() { const isChecked = document.getElementById('selectAllSms').checked; document.querySelectorAll('.sms-checkbox').forEach(cb => cb.checked = isChecked); };
-        window.sendSingleSms = async function(cardId) { try { await setDoc(doc(db, "beneficiaries", cardId), { sms_status: 'pending' }, { merge: true }); playSound('success'); } catch(e) { alert('خطأ'); } };
-        window.sendSmsToSelected = async function() { const checkboxes = document.querySelectorAll('.sms-checkbox:checked'); if (checkboxes.length === 0) return alert('الرجاء تحديد شخص واحد على الأقل.'); for (let cb of checkboxes) { await setDoc(doc(db, "beneficiaries", cb.value), { sms_status: 'pending' }, { merge: true }); } playSound('success'); document.getElementById('selectAllSms').checked = false; };
-        window.sendSmsToAllFiltered = async function() { const currentCount = document.querySelectorAll('.sms-checkbox').length; if (currentCount === 0) return; if (!confirm(`إرسال لـ (${currentCount}) شخص؟`)) return; const checkboxes = document.querySelectorAll('.sms-checkbox'); for (let cb of checkboxes) { await setDoc(doc(db, "beneficiaries", cb.value), { sms_status: 'pending' }, { merge: true }); } playSound('success'); };
+
+        window.toggleSelectAllSms = function() {
+            const isChecked = document.getElementById('selectAllSms').checked;
+            document.querySelectorAll('#smsTableBody .sms-checkbox').forEach(cb => cb.checked = isChecked);
+        };
+
+        window.sendSingleSms = async function(cardId) {
+            if (!cardId) return;
+            await saveWhatsappSettings();
+            const person = smsRealTimeData.find(x => String(x.card_id) === String(cardId)) || { card_id: cardId };
+            const msg = buildPersonalizedMessage(person);
+            try {
+                await setDoc(doc(db, "beneficiaries", String(cardId)), {
+                    sms_status: 'pending',
+                    sms_message: msg,
+                    sms_error: '',
+                    sms_requested_at: Date.now()
+                }, { merge: true });
+                playSound('success');
+            } catch(e) { alert('حدث خطأ أثناء جدولة الرسالة.'); }
+        };
+
+        window.sendSmsToSelected = async function() {
+            const checkboxes = document.querySelectorAll('#smsTableBody .sms-checkbox:checked');
+            if (checkboxes.length === 0) return alert('الرجاء تحديد مستفيد واحد على الأقل من الجدول.');
+            await saveWhatsappSettings();
+
+            const ops = [];
+            checkboxes.forEach(cb => {
+                const cId = cb.value;
+                if (!cId || cId === 'on') return;
+                const person = smsRealTimeData.find(x => String(x.card_id) === String(cId)) || { card_id: cId };
+                ops.push({
+                    type: 'set',
+                    ref: doc(db, "beneficiaries", String(cId)),
+                    data: {
+                        sms_status: 'pending',
+                        sms_message: buildPersonalizedMessage(person),
+                        sms_error: '',
+                        sms_requested_at: Date.now()
+                    },
+                    options: { merge: true }
+                });
+            });
+
+            await executeBatchOperations(ops);
+            playSound('success');
+            document.getElementById('selectAllSms').checked = false;
+        };
+
+        window.sendSmsToAllFiltered = async function() {
+            const checkboxes = document.querySelectorAll('#smsTableBody .sms-checkbox');
+            if (checkboxes.length === 0) return alert('لا يوجد مستفيدين في القائمة الحالية.');
+            if (!confirm(`هل أنت متأكد من إرسال رسائل واتساب لـ (${checkboxes.length}) مستفيد؟`)) return;
+            await saveWhatsappSettings();
+
+            const ops = [];
+            checkboxes.forEach(cb => {
+                const cId = cb.value;
+                if (!cId || cId === 'on') return;
+                const person = smsRealTimeData.find(x => String(x.card_id) === String(cId)) || { card_id: cId };
+                ops.push({
+                    type: 'set',
+                    ref: doc(db, "beneficiaries", String(cId)),
+                    data: {
+                        sms_status: 'pending',
+                        sms_message: buildPersonalizedMessage(person),
+                        sms_error: '',
+                        sms_requested_at: Date.now()
+                    },
+                    options: { merge: true }
+                });
+            });
+
+            await executeBatchOperations(ops);
+            playSound('success');
+        };
+
+        window.resetAllSmsStatuses = async function() {
+            if (!confirm("هل تريد تصفير حالات الإرسال لجميع المستفيدين في القائمة الحالية؟")) return;
+            const checkboxes = document.querySelectorAll('#smsTableBody .sms-checkbox');
+            const ops = [];
+            checkboxes.forEach(cb => {
+                const cId = cb.value;
+                if (!cId || cId === 'on') return;
+                ops.push({
+                    type: 'set',
+                    ref: doc(db, "beneficiaries", String(cId)),
+                    data: { sms_status: '', sms_error: '' },
+                    options: { merge: true }
+                });
+            });
+            await executeBatchOperations(ops);
+            playSound('success');
+        };
 
         // --- الأرشيف ---
-        async function fetchAllDeliveries() { const q = query(collection(db, "deliveries")); const qs = await getDocs(q); allDeliveriesGlobal = []; qs.forEach((doc) => allDeliveriesGlobal.push(doc.data())); }
-        async function fetchAllBeneficiaries() { const qs = await getDocs(collection(db, "beneficiaries")); allBeneficiaries = []; qs.forEach((doc) => allBeneficiaries.push(doc.data())); }
+        async function fetchAllDeliveries() {
+            const q = query(collection(db, "deliveries"));
+            const qs = await getDocs(q);
+            allDeliveriesGlobal = [];
+            qs.forEach((docSnap) => allDeliveriesGlobal.push(docSnap.data()));
+        }
+        async function fetchAllBeneficiaries() {
+            const qs = await getDocs(collection(db, "beneficiaries"));
+            allBeneficiaries = [];
+            qs.forEach((docSnap) => allBeneficiaries.push(docSnap.data()));
+        }
         
-        window.loadArchiveCategory = async function(catFilter, btn) { document.querySelectorAll('#archivePage .tab-btn').forEach(b => b.classList.remove('active')); if(btn) btn.classList.add('active'); document.getElementById('archiveNamesList').innerHTML = "جاري التحميل..."; document.getElementById('archiveDetailsContent').innerHTML = "اختر اسماً من القائمة الجانبية."; if(allBeneficiaries.length === 0) await fetchAllBeneficiaries(); if(allDeliveriesGlobal.length === 0) await fetchAllDeliveries(); currentArchiveCategoryData = allBeneficiaries.filter(b => { const bc = b.category || ""; if(catFilter === 'فقير') return bc.includes('فقير') || bc.includes('فقراء'); if(catFilter === 'إعاقة') return bc.includes('إعاقة') || bc.includes('اعاقة'); return bc.includes(catFilter); }); renderArchiveNames(currentArchiveCategoryData); };
-        window.filterArchiveNames = function() { const query = document.getElementById('archiveSearchInput').value.toLowerCase(); renderArchiveNames(currentArchiveCategoryData.filter(b => b.name.toLowerCase().includes(query))); }
-        function renderArchiveNames(list) { const listDiv = document.getElementById('archiveNamesList'); listDiv.innerHTML = ""; if(list.length === 0) { listDiv.innerHTML = "لا يوجد أسماء"; return; } list.forEach(b => { const btn = document.createElement('button'); btn.className = 'archive-name-btn'; btn.innerText = b.name; btn.style.display = "block"; btn.style.width = "100%"; btn.style.padding = "15px"; btn.style.marginBottom = "10px"; btn.style.border = "1px solid #e2e8f0"; btn.style.borderRadius = "10px"; btn.style.background = "#f8fafc"; btn.style.cursor = "pointer"; btn.style.fontWeight = "800"; btn.onclick = () => { document.querySelectorAll('.archive-name-btn').forEach(x => {x.style.background = "#f8fafc"; x.style.color="var(--text-main)";}); btn.style.background = "var(--accent)"; btn.style.color = "white"; showPersonArchive(b); }; listDiv.appendChild(btn); }); }
-        function showPersonArchive(person) {
-            const contentDiv = document.getElementById('archiveDetailsContent');
-            const personHistory = allDeliveriesGlobal.filter(d => d.card_id === person.card_id);
-            let html = `<h3 style="color:var(--primary); font-size:28px; border-bottom:3px solid var(--gold); padding-bottom:15px;">${person.name} <br><span style="font-size:18px;">(${person.card_id}) - ${person.category || ''}</span></h3>`;
-            html += `<h4 style="color:var(--success); text-align:right; font-size:24px;">سجل الاستلام (آخر 3 توزيعات محفوظة):</h4><ul style="list-style:none; padding:0; text-align:right;">`;
-            if(personHistory.length === 0) html += `<li style="background:#f1f5f9; color:#64748b; padding:15px; border-radius:10px; margin-bottom:10px;">لم يستلم أي مادة أو تم حذف سجلاته القديمة.</li>`;
-            else { personHistory.sort((a,b) => (b.timestamp_ms || 0) - (a.timestamp_ms || 0)); personHistory.forEach(h => html += `<li style="background:#d1fae5; color:#065f46; padding:15px; border-radius:10px; margin-bottom:10px; display:flex; justify-content:space-between;"><span>${h.item_name} (رقم التوزيع: ${h.campaign_id || '-'})</span><span style="font-size:16px;">${h.date}</span></li>`); }
-            html += `</ul>`; contentDiv.innerHTML = html;
+        window.loadArchiveCategory = async function(catFilter, btn) {
+            document.querySelectorAll('#archivePage .tab-btn').forEach(b => b.classList.remove('active'));
+            if(btn) btn.classList.add('active');
+            document.getElementById('archiveNamesList').innerHTML = "جاري التحميل...";
+            document.getElementById('archiveDetailsContent').innerHTML = "اختر اسماً من القائمة الجانبية.";
+            if(allBeneficiaries.length === 0) await fetchAllBeneficiaries();
+            await fetchAllDeliveries();
+            currentArchiveCategoryData = allBeneficiaries.filter(b => {
+                const bc = b.category || "";
+                if(catFilter === 'فقير') return bc.includes('فقير') || bc.includes('فقراء');
+                if(catFilter === 'إعاقة') return bc.includes('إعاقة') || bc.includes('اعاقة');
+                return bc.includes(catFilter);
+            });
+            renderArchiveNames(currentArchiveCategoryData);
+        };
+
+        window.filterArchiveNames = function() {
+            const qStr = document.getElementById('archiveSearchInput').value.toLowerCase();
+            renderArchiveNames(currentArchiveCategoryData.filter(b =>
+                (b.name && b.name.toLowerCase().includes(qStr)) ||
+                (b.card_id && String(b.card_id).includes(qStr))
+            ));
+        };
+
+        function renderArchiveNames(list) {
+            const listDiv = document.getElementById('archiveNamesList');
+            listDiv.innerHTML = "";
+            if(list.length === 0) { listDiv.innerHTML = "لا يوجد أسماء"; return; }
+            list.forEach(b => {
+                const btn = document.createElement('button');
+                btn.className = 'archive-name-btn';
+                btn.innerText = `${b.name} (${b.card_id})`;
+                btn.style.display = "block";
+                btn.style.width = "100%";
+                btn.style.padding = "14px";
+                btn.style.marginBottom = "10px";
+                btn.style.border = "1px solid #e2e8f0";
+                btn.style.borderRadius = "10px";
+                btn.style.background = "#f8fafc";
+                btn.style.cursor = "pointer";
+                btn.style.fontWeight = "800";
+                btn.style.fontFamily = "'Tajawal', sans-serif";
+                btn.style.fontSize = "17px";
+                btn.onclick = () => {
+                    document.querySelectorAll('.archive-name-btn').forEach(x => {x.style.background = "#f8fafc"; x.style.color="var(--text-main)";});
+                    btn.style.background = "var(--accent)";
+                    btn.style.color = "white";
+                    showPersonArchive(b);
+                };
+                listDiv.appendChild(btn);
+            });
         }
 
-        // --- التقارير المطورة وحل الإكسل ---
+        function showPersonArchive(person) {
+            const contentDiv = document.getElementById('archiveDetailsContent');
+            const personHistory = allDeliveriesGlobal.filter(d => String(d.card_id) === String(person.card_id));
+            let html = `<h3 style="color:var(--primary); font-size:26px; border-bottom:3px solid var(--gold); padding-bottom:15px;">${escapeHtml(person.name)} <br><span style="font-size:18px;">رقم البطاقة: (${escapeHtml(person.card_id)}) - الفئة: ${escapeHtml(person.category || '-')} - الجوال: ${escapeHtml(person.phone || '-')}</span></h3>`;
+            html += `<h4 style="color:var(--success); text-align:right; font-size:22px;">سجل الاستلام في آخر 3 حملات محفوظة:</h4><ul style="list-style:none; padding:0; text-align:right;">`;
+            if(personHistory.length === 0) {
+                html += `<li style="background:#f1f5f9; color:#64748b; padding:15px; border-radius:10px; margin-bottom:10px;">لم يستلم أي مادة في الحملات الثلاث الأخيرة.</li>`;
+            } else {
+                personHistory.sort((a,b) => (b.timestamp_ms || 0) - (a.timestamp_ms || 0));
+                personHistory.forEach(h => {
+                    html += `<li style="background:#d1fae5; color:#065f46; padding:15px; border-radius:10px; margin-bottom:10px; display:flex; justify-content:space-between; flex-wrap:wrap;"><span><strong>${escapeHtml(h.item_name)}</strong> (التوزيع رقم: ${escapeHtml(h.campaign_id || 'قديم')})</span><span style="font-size:16px;">${escapeHtml(h.date)}</span></li>`;
+                });
+            }
+            html += `</ul>`;
+            contentDiv.innerHTML = html;
+        }
+
+        // --- التقارير المطورة مع فلترة دقيقة حسب فئة الحملة ---
         window.setupReportsFilters = async function() {
             if(allBeneficiaries.length === 0) await fetchAllBeneficiaries();
             await fetchAllDeliveries();
+            await fetchCampaignsMeta();
             
             const select = document.getElementById('reportCampaignSelect');
             select.innerHTML = '';
             
-            // استخراج التوزيعات المميزة من قاعدة البيانات (رقم التوزيع + اسم المادة)
             let uniqueCampaigns = [];
             allDeliveriesGlobal.forEach(d => {
-                let campStr = `${d.campaign_id || 'قديم'}_${d.item_name}`;
+                const cId = d.campaign_id || 'قديم';
+                const campStr = `${cId}:::${d.item_name}`;
                 if(!uniqueCampaigns.find(x => x.val === campStr)) {
-                    uniqueCampaigns.push({ val: campStr, name: `توزيع رقم ${d.campaign_id || 'قديم'} - ${d.item_name}`, id: d.campaign_id || 0 });
+                    uniqueCampaigns.push({
+                        val: campStr,
+                        name: `توزيع رقم ${cId} - مادة: ${d.item_name}`,
+                        id: Number(d.campaign_id) || 0
+                    });
                 }
             });
             
-            // ترتيب تنازلي ليكون آخر توزيع بالاعلى
             uniqueCampaigns.sort((a,b) => b.id - a.id);
             
             if(uniqueCampaigns.length === 0) {
-                select.innerHTML = '<option value="">لا يوجد توزيعات مسجلة بعد</option>';
+                select.innerHTML = '<option value="">لا يوجد توزيعات مسجلة حالياً</option>';
+                document.getElementById('reportCampaignMetaInfo').innerText = '';
             } else {
-                uniqueCampaigns.forEach(c => { select.innerHTML += `<option value="${c.val}">${c.name}</option>`; });
-                generateReportData(); // تشغيل التقرير لأول (آخر) توزيع تلقائياً
+                uniqueCampaigns.forEach(c => {
+                    const opt = document.createElement('option');
+                    opt.value = c.val;
+                    opt.textContent = c.name;
+                    select.appendChild(opt);
+                });
+                generateReportData();
             }
         };
 
@@ -647,23 +1287,39 @@
             const selValue = document.getElementById('reportCampaignSelect').value;
             if(!selValue) return;
             
-            let parts = selValue.split('_');
-            let targetCampId = parts[0];
-            let targetItem = parts[1];
+            const parts = selValue.split(':::');
+            const targetCampId = parts[0];
+            const targetItem = parts.slice(1).join(':::');
             
-            missedListForExport = []; doneListForExport = [];
+            const campMeta = campaignsMetaMap[String(targetCampId)] || {};
+            const targetCategory = campMeta.category || "الكل";
+            document.getElementById('reportCampaignMetaInfo').innerHTML =
+                `الفئة المستهدفة في هذا التوزيع: <strong style="color:var(--accent);">${escapeHtml(targetCategory)}</strong>`;
+
+            missedListForExport = [];
+            doneListForExport = [];
             
-            // من هم الأشخاص الذين استلموا هذه المادة في هذه الحملة؟
-            const deliveriesForThisCamp = allDeliveriesGlobal.filter(d => (d.campaign_id == targetCampId || (targetCampId === 'قديم' && !d.campaign_id)) && d.item_name === targetItem);
-            const receivedCardIds = deliveriesForThisCamp.map(d => String(d.card_id));
+            const deliveriesForThisCamp = allDeliveriesGlobal.filter(d =>
+                (String(d.campaign_id) === String(targetCampId) || (targetCampId === 'قديم' && !d.campaign_id)) &&
+                d.item_name === targetItem
+            );
+            const receivedMap = new Map();
+            deliveriesForThisCamp.forEach(d => receivedMap.set(String(d.card_id), d.date));
             
-            // لمعرفة المرفوضين (الذين لم يستلموا)، يجب أن نعرف فئة التوزيع. (بشكل عام نعرض كل من لم يستلم)
+            // فلترة المستفيدين حسب فئة الحملة (بحيث لا يظهر الأرامل ضمن غير المستلمين في حملة أيتام فقط!)
             allBeneficiaries.forEach(b => {
                 const bId = String(b.card_id);
-                if(receivedCardIds.includes(bId)) {
-                    const dDate = deliveriesForThisCamp.find(x => String(x.card_id) === bId).date;
-                    doneListForExport.push({ ...b, delivery_date: dDate, item_name: targetItem });
-                } else {
+                const bc = b.category || "";
+                let isEligible = true;
+                if (targetCategory !== "الكل") {
+                    if (targetCategory === 'فقير') isEligible = bc.includes('فقير') || bc.includes('فقراء');
+                    else if (targetCategory === 'إعاقة') isEligible = bc.includes('إعاقة') || bc.includes('اعاقة');
+                    else isEligible = bc.includes(targetCategory);
+                }
+
+                if (receivedMap.has(bId)) {
+                    doneListForExport.push({ ...b, delivery_date: receivedMap.get(bId), item_name: targetItem });
+                } else if (isEligible) {
                     missedListForExport.push(b);
                 }
             });
@@ -674,16 +1330,40 @@
         };
 
         window.switchReportTab = function(tab) {
-            currentReportTab = tab; document.getElementById('btnTabMissed').classList.remove('active'); document.getElementById('btnTabDone').classList.remove('active');
-            if(tab === 'missed') { document.getElementById('btnTabMissed').classList.add('active'); document.getElementById('reportTitle').innerText = 'قائمة بأسماء غير المستلمين:'; document.getElementById('reportTitle').style.color = 'var(--danger)'; document.getElementById('thTime').style.display = 'none'; }
-            else { document.getElementById('btnTabDone').classList.add('active'); document.getElementById('reportTitle').innerText = 'قائمة بأسماء المستلمين:'; document.getElementById('reportTitle').style.color = 'var(--success)'; document.getElementById('thTime').style.display = 'table-cell'; }
+            currentReportTab = tab;
+            document.getElementById('btnTabMissed').classList.remove('active');
+            document.getElementById('btnTabDone').classList.remove('active');
+            if(tab === 'missed') {
+                document.getElementById('btnTabMissed').classList.add('active');
+                document.getElementById('reportTitle').innerText = 'قائمة بأسماء غير المستلمين:';
+                document.getElementById('reportTitle').style.color = 'var(--danger)';
+                document.getElementById('thTime').style.display = 'none';
+            } else {
+                document.getElementById('btnTabDone').classList.add('active');
+                document.getElementById('reportTitle').innerText = 'قائمة بأسماء المستلمين:';
+                document.getElementById('reportTitle').style.color = 'var(--success)';
+                document.getElementById('thTime').style.display = 'table-cell';
+            }
             renderReportTable();
         };
 
         window.renderReportTable = function() {
-            const tbody = document.getElementById('reportTableBody'); const activeList = currentReportTab === 'missed' ? missedListForExport : doneListForExport; let tableHtml = "";
-            if(activeList.length === 0) tableHtml = `<tr><td colspan="5" style="text-align:center; font-weight:900; padding:40px;">الجدول فارغ</td></tr>`;
-            else activeList.forEach(b => { tableHtml += `<tr><td style="font-weight:900;">${b.card_id}</td><td style="font-weight:900; color:var(--primary);">${b.name}</td><td>${b.category || '-'}</td><td dir="ltr">${b.phone || '-'}</td>${currentReportTab === 'done' ? `<td style="font-weight:900; color:var(--success); line-height:1.4;">${b.delivery_date} <br><span style="font-size:16px;">(${b.item_name})</span></td>` : ''}</tr>`; });
+            const tbody = document.getElementById('reportTableBody');
+            const activeList = currentReportTab === 'missed' ? missedListForExport : doneListForExport;
+            let tableHtml = "";
+            if(activeList.length === 0) {
+                tableHtml = `<tr><td colspan="5" style="text-align:center; font-weight:900; padding:40px;">الجدول فارغ</td></tr>`;
+            } else {
+                activeList.forEach(b => {
+                    tableHtml += `<tr>
+                        <td style="font-weight:900;">${escapeHtml(b.card_id)}</td>
+                        <td style="font-weight:900; color:var(--primary);">${escapeHtml(b.name)}</td>
+                        <td>${escapeHtml(b.category || '-')}</td>
+                        <td dir="ltr">${escapeHtml(b.phone || '-')}</td>
+                        ${currentReportTab === 'done' ? `<td style="font-weight:900; color:var(--success); line-height:1.4;">${escapeHtml(b.delivery_date)} <br><span style="font-size:15px;">(${escapeHtml(b.item_name)})</span></td>` : ''}
+                    </tr>`;
+                });
+            }
             tbody.innerHTML = tableHtml;
         };
 
@@ -692,7 +1372,7 @@
             if(activeList.length === 0) return alert("لا يوجد بيانات للتصدير في هذا الجدول.");
             
             const selValue = document.getElementById('reportCampaignSelect');
-            const reportName = selValue.options[selValue.selectedIndex].text;
+            const reportName = selValue.options[selValue.selectedIndex]?.text || "تقرير";
 
             const dataToExport = activeList.map(b => ({ 
                 "رقم البطاقة": String(b.card_id || ""), 
@@ -704,43 +1384,156 @@
                 "وقت التسليم": currentReportTab === 'done' ? String(b.delivery_date || "") : "-" 
             }));
             
-            const worksheet = XLSX.utils.json_to_sheet(dataToExport); const workbook = XLSX.utils.book_new(); 
+            const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+            const workbook = XLSX.utils.book_new(); 
             const sheetName = currentReportTab === 'missed' ? "غير مستلمين" : "مستلمين";
             
             XLSX.utils.book_append_sheet(workbook, worksheet, sheetName); 
             XLSX.writeFile(workbook, `${reportName}_${sheetName}.xlsx`);
         };
 
-        // --- الإحصائيات (لم تتغير لتبقى بنفس الدقة القديمة) ---
+        window.exportFullCampaignArchiveById = async function() {
+            const selValue = document.getElementById('reportCampaignSelect').value;
+            if (!selValue) return alert("اختر توزيعاً أولاً.");
+            const targetCampId = selValue.split(':::')[0];
+            const campDeliveries = allDeliveriesGlobal.filter(d =>
+                String(d.campaign_id) === String(targetCampId) || (targetCampId === 'قديم' && !d.campaign_id)
+            );
+            await exportCampaignFullExcel(targetCampId, campDeliveries);
+        };
+
+        // --- الإحصائيات ---
         window.loadStats = async function() {
             document.getElementById('tablesContainer').innerHTML = "<div style='text-align:center; padding:40px; font-weight:900;'>جاري تحميل البيانات...</div>";
-            try { await fetchAllBeneficiaries(); let stats = { total: 0, orphans: 0, widows: 0, divorced: 0, poor: 0, special: 0 };
-                allBeneficiaries.forEach((data) => { stats.total++; const cat = data.category || ""; if(cat.includes('ايتام')) stats.orphans++; else if(cat.includes('ارملة')) stats.widows++; else if(cat.includes('مطلقة')) stats.divorced++; else if(cat.includes('فقير')) stats.poor++; else if(cat.includes('إعاقة')) stats.special++; });
-                document.getElementById('stat-total').innerText = stats.total; document.getElementById('stat-orphans').innerText = stats.orphans; document.getElementById('stat-widows').innerText = stats.widows; document.getElementById('stat-divorced').innerText = stats.divorced; document.getElementById('stat-poor').innerText = stats.poor; document.getElementById('stat-special').innerText = stats.special;
-                if(myChart) myChart.destroy(); myChart = new Chart(document.getElementById('categoryChart').getContext('2d'), { type: 'doughnut', data: { labels: ['أيتام', 'أرامل', 'مطلقات', 'فقير', 'إعاقة'], datasets: [{ data: [stats.orphans, stats.widows, stats.divorced, stats.poor, stats.special], backgroundColor: ['#db2777', '#7c3aed', '#ea580c', '#059669', '#2563eb'] }] }, options: { responsive: true, maintainAspectRatio: false } });
+            try {
+                await fetchAllBeneficiaries();
+                let stats = { total: 0, orphans: 0, widows: 0, divorced: 0, poor: 0, special: 0 };
+                allBeneficiaries.forEach((data) => {
+                    stats.total++;
+                    const cat = data.category || "";
+                    if(cat.includes('ايتام')) stats.orphans++;
+                    else if(cat.includes('ارملة')) stats.widows++;
+                    else if(cat.includes('مطلقة')) stats.divorced++;
+                    else if(cat.includes('فقير') || cat.includes('فقراء')) stats.poor++;
+                    else if(cat.includes('إعاقة') || cat.includes('اعاقة')) stats.special++;
+                });
+                document.getElementById('stat-total').innerText = stats.total;
+                document.getElementById('stat-orphans').innerText = stats.orphans;
+                document.getElementById('stat-widows').innerText = stats.widows;
+                document.getElementById('stat-divorced').innerText = stats.divorced;
+                document.getElementById('stat-poor').innerText = stats.poor;
+                document.getElementById('stat-special').innerText = stats.special;
+                if(myChart) myChart.destroy();
+                myChart = new Chart(document.getElementById('categoryChart').getContext('2d'), {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['أيتام', 'أرامل', 'مطلقات', 'فقير', 'إعاقة'],
+                        datasets: [{
+                            data: [stats.orphans, stats.widows, stats.divorced, stats.poor, stats.special],
+                            backgroundColor: ['#db2777', '#7c3aed', '#ea580c', '#059669', '#2563eb']
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false }
+                });
                 buildTables(allBeneficiaries);
             } catch (e) {}
         };
-        window.filterTables = function() { const query = document.getElementById('searchInput').value.toLowerCase(); buildTables((query==="") ? allBeneficiaries : allBeneficiaries.filter(b => (b.name && b.name.toLowerCase().includes(query)) || (b.card_id && b.card_id.includes(query)))); };
-        function buildTables(dataList) {
-            const container = document.getElementById('tablesContainer'); container.innerHTML = "";
-            ['ايتام', 'ارملة', 'مطلقة', 'فقير', 'إعاقة'].forEach(cat => { const catData = dataList.filter(b => { const bc = b.category || ""; if(cat === 'فقير') return bc.includes('فقير'); if(cat === 'إعاقة') return bc.includes('إعاقة') || bc.includes('اعاقة'); return bc.includes(cat); }); let html = `<div id="table-${cat}" class="category-table" style="display:${cat==='ايتام'?'block':'none'};"><table><tr><th>رقم البطاقة</th><th>الاسم الكامل</th><th>رقم الجوال</th></tr>`; catData.forEach(b => { html += `<tr><td style="font-weight:900;">${b.card_id}</td><td style="font-weight:900;">${b.name}</td><td dir="ltr">${b.phone || '-'}</td></tr>`; }); html += `</table></div>`; container.innerHTML += html; });
-        }
-        window.showCategoryTable = function(cat, btn) { document.querySelectorAll('#dashboardPage .tab-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); document.querySelectorAll('#dashboardPage .category-table').forEach(t => t.style.display = 'none'); document.getElementById(`table-${cat}`).style.display = 'block'; };
 
-        // رفع الملف
+        window.filterTables = function() {
+            const qStr = document.getElementById('searchInput').value.toLowerCase();
+            buildTables((qStr === "") ? allBeneficiaries : allBeneficiaries.filter(b =>
+                (b.name && b.name.toLowerCase().includes(qStr)) ||
+                (b.card_id && String(b.card_id).includes(qStr))
+            ));
+        };
+
+        function buildTables(dataList) {
+            const container = document.getElementById('tablesContainer');
+            container.innerHTML = "";
+            ['ايتام', 'ارملة', 'مطلقة', 'فقير', 'إعاقة'].forEach(cat => {
+                const catData = dataList.filter(b => {
+                    const bc = b.category || "";
+                    if(cat === 'فقير') return bc.includes('فقير') || bc.includes('فقراء');
+                    if(cat === 'إعاقة') return bc.includes('إعاقة') || bc.includes('اعاقة');
+                    return bc.includes(cat);
+                });
+                let html = `<div id="table-${cat}" class="category-table" style="display:${cat==='ايتام'?'block':'none'};"><table><thead><tr><th>رقم البطاقة</th><th>الاسم الكامل</th><th>رقم الجوال</th></tr></thead><tbody>`;
+                catData.forEach(b => {
+                    html += `<tr><td style="font-weight:900;">${escapeHtml(b.card_id)}</td><td style="font-weight:900;">${escapeHtml(b.name)}</td><td dir="ltr">${escapeHtml(b.phone || '-')}</td></tr>`;
+                });
+                html += `</tbody></table></div>`;
+                container.innerHTML += html;
+            });
+        }
+
+        window.showCategoryTable = function(cat, btn) {
+            document.querySelectorAll('#dashboardPage .tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            document.querySelectorAll('#dashboardPage .category-table').forEach(t => t.style.display = 'none');
+            document.getElementById(`table-${cat}`).style.display = 'block';
+        };
+
+        // --- رفع ملف الإكسل بنظام الدفعات السريع (writeBatch) ---
         document.getElementById('fileUpload').addEventListener('change', async function(e) {
-            const file = e.target.files[0]; if (!file) return;
-            if(!confirm("تحذير: سيتم مسح جميع بيانات المستفيدين من القاعدة! متأكد؟")) { e.target.value = ""; return; }
-            const statusDiv = document.getElementById('uploadStatus'); statusDiv.innerHTML = "جاري الرفع...";
+            const file = e.target.files[0];
+            if (!file) return;
+            const mode = document.getElementById('excelUploadMode').value;
+            const confirmMsg = mode === 'replace'
+                ? "تحذير: لقد اخترت (استبدال شامل)، سيتم مسح جميع بيانات المستفيدين الحالية واستبدالها بالملف الجديد! هل أنت متأكد؟"
+                : "سيتم دمج وتحديث بيانات المستفيدين من ملف الإكسل دون مسح البيانات السابقة. هل تريد المتابعة؟";
+
+            if(!confirm(confirmMsg)) { e.target.value = ""; return; }
+
+            const statusDiv = document.getElementById('uploadStatus');
+            statusDiv.innerHTML = "جاري قراءة الملف وتجهيز الدفعات...";
+
             try {
-                const q = query(collection(db, "beneficiaries")); const qs = await getDocs(q); const dp = []; qs.forEach((doc) => dp.push(deleteDoc(doc(db, "beneficiaries", doc.id)))); await Promise.all(dp);
-                const reader = new FileReader(); reader.onload = async function(e) {
-                    const data = new Uint8Array(e.target.result); const workbook = XLSX.read(data, {type: 'array'}); const json_data = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]); let successCount = 0;
-                    for (let row of json_data) { const cardId = String(row['مسلسل']).trim(); if(!cardId || cardId === "undefined") continue; let cat = String(row['الحالة العائلية']).trim() || ""; if(cat.includes('فقراء')) cat = 'فقير'; if(cat.includes('احتياجات')) cat = 'إعاقة'; await setDoc(doc(collection(db, "beneficiaries"), cardId), { card_id: cardId, name: row['اسم المستفيد الثلاثي'] || "", category: cat, phone: row['رقم الجوال']?String(row['رقم الجوال']):"" }); successCount++; if(successCount%10===0) statusDiv.innerHTML=`الرفع: ${successCount}`; }
-                    statusDiv.innerHTML = `تم بنجاح! (${successCount} اسم)`; playSound('success'); loadStats();
-                }; reader.readAsArrayBuffer(file);
-            } catch(e) { statusDiv.innerHTML = "حدث خطأ."; }
+                if (mode === 'replace') {
+                    statusDiv.innerHTML = "جاري مسح القائمة القديمة...";
+                    const qs = await getDocs(query(collection(db, "beneficiaries")));
+                    const delOps = [];
+                    qs.forEach((d) => delOps.push({ type: 'delete', ref: doc(db, "beneficiaries", d.id) }));
+                    await executeBatchOperations(delOps);
+                }
+
+                const reader = new FileReader();
+                reader.onload = async function(ev) {
+                    const data = new Uint8Array(ev.target.result);
+                    const workbook = XLSX.read(data, {type: 'array'});
+                    const json_data = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
+                    
+                    const setOps = [];
+                    for (let row of json_data) {
+                        const cardId = String(row['مسلسل'] || row['رقم البطاقة'] || "").trim();
+                        if(!cardId || cardId === "undefined") continue;
+                        let cat = String(row['الحالة العائلية'] || row['الفئة'] || "").trim();
+                        if(cat.includes('فقراء')) cat = 'فقير';
+                        if(cat.includes('احتياجات') || cat.includes('اعاقة')) cat = 'إعاقة';
+                        const nameVal = String(row['اسم المستفيد الثلاثي'] || row['الاسم الكامل'] || row['الاسم'] || "").trim();
+                        const phoneVal = row['رقم الجوال'] || row['الجوال'] ? String(row['رقم الجوال'] || row['الجوال']).trim() : "";
+
+                        setOps.push({
+                            type: 'set',
+                            ref: doc(db, "beneficiaries", cardId),
+                            data: { card_id: cardId, name: nameVal, category: cat, phone: phoneVal },
+                            options: { merge: true }
+                        });
+                    }
+
+                    await executeBatchOperations(setOps, (done, total) => {
+                        statusDiv.innerHTML = `جاري الرفع السريع: ${done} من ${total}...`;
+                    });
+
+                    statusDiv.innerHTML = `تم الرفع بنجاح! (${setOps.length} مستفيد) ✔️`;
+                    playSound('success');
+                    loadStats();
+                    e.target.value = "";
+                };
+                reader.readAsArrayBuffer(file);
+            } catch(err) {
+                console.error(err);
+                statusDiv.innerHTML = "حدث خطأ أثناء رفع الملف.";
+            }
         });
     </script>
 </body>
